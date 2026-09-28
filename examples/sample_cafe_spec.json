@@ -1,0 +1,58 @@
+{
+  "mode": "generation",
+  "robot": {
+    "sim_model": "PandaOmron",
+    "customer_robot": "single-arm Franka-like barista robot"
+  },
+  "task": "CafeServeCoffee",
+  "task_steps": [
+    "Pick up the cup of coffee",
+    "Place the cup on the tray"
+  ],
+  "environment": {
+    "scene_template": "robocasa_cafe_counter",
+    "description": "realistic cafe counter with a tray stack, cups, coffee machine and milk station",
+    "layout_variety": "few",
+    "style_variety": "few"
+  },
+  "data": {
+    "cameras": [
+      {
+        "name": "robot0_agentview_center",
+        "width": 128,
+        "height": 128,
+        "fps": 20
+      },
+      {
+        "name": "robot0_eye_in_hand",
+        "width": 128,
+        "height": 128,
+        "fps": 20
+      }
+    ],
+    "sensors": [
+      "rgb",
+      "joint_state",
+      "eef_pose",
+      "gripper_state",
+      "action",
+      "object_pose",
+      "task_stage"
+    ],
+    "control_hz": 20,
+    "format": "hdf5"
+  },
+  "episode_count": 200,
+  "success_rule": {
+    "type": "all_stages_completed",
+    "time_limit_s": 180.0
+  },
+  "reference_failure": null,
+  "assumptions": [
+    "time_limit_s 180 (not stated)",
+    "object_pose and task_stage added for QA"
+  ],
+  "out_of_scope": [
+    "real liquid physics (the coffee in the cup is a visual; brewing and pouring are not simulated)"
+  ]
+}

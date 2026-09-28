@@ -1,0 +1,4 @@
+Our barista robot keeps failing when it serves coffee at the cafe counter. In the videos it loses the grip on the
+handle when it picks up the cup of coffee, and the cup tips over on the tray rim when it is placed.
+Please reproduce picking up the cup and moving it onto the tray, and collect 300 episodes that cover these failures.
+We need a wrist camera and a front camera, joint states and actions.

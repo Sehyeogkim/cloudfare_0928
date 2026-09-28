@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WEMINE · Sign in</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fbfbfa; --panel: #ffffff; --ink: #17181a; --ink-2: #4b4f55; --muted: #8a8f96;
+  --line: #e7e7e4; --hover: #f0f0ed; --blue: #2b5fd9; --coffee: #3b2416; --coffee-2: #c47a2c; --cream: #faf3ea;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--font); -webkit-font-smoothing: antialiased;
+  display: grid; place-items: center; padding: 24px 16px; min-height: 100vh; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.wrap { width: 100%; max-width: 440px; }
+.wrap.wide { max-width: 760px; }
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.logo { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--coffee-2), var(--coffee)); display: grid; place-items: center; color: #fff; flex: none; }
+.logo svg { width: 24px; height: 24px; }
+.brand b { font-size: 20px; letter-spacing: .02em; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px; box-shadow: 0 1px 2px rgba(0,0,0,.03), 0 8px 24px rgba(0,0,0,.04); }
+h1 { font-size: 22px; margin: 0 0 6px; letter-spacing: -.01em; }
+.sub { color: var(--ink-2); margin: 0 0 22px; }
+.gbtn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; background: #fff; border: 1px solid #dadce0;
+  border-radius: 8px; padding: 11px 16px; font-weight: 500; color: #3c4043; }
+.gbtn:hover { background: #f8f9fa; }
+.gbtn svg { width: 18px; height: 18px; }
+.cap { color: var(--muted); font-size: 12.5px; margin: 12px 0 0; text-align: center; }
+
+.picker { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.picker h2 { font-size: 13px; font-weight: 600; margin: 0; padding: 12px 14px; border-bottom: 1px solid var(--line); background: #fafaf8; }
+.acct { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; border-bottom: 1px solid var(--line); background: #fff; text-align: left; }
+.acct:last-child { border-bottom: 0; }
+.acct:hover { background: var(--hover); }
+.av { width: 32px; height: 32px; border-radius: 50%; background: var(--coffee); color: #fff; display: grid; place-items: center; font-weight: 600; flex: none; }
+.av.plus { background: #eceae6; color: var(--ink-2); font-size: 18px; font-weight: 400; }
+.acct small { display: block; color: var(--muted); font-size: 12.5px; }
+.other { padding: 14px; display: grid; gap: 10px; border-top: 1px solid var(--line); }
+.other label { font-size: 12.5px; color: var(--ink-2); display: grid; gap: 4px; }
+.other input { font: inherit; border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; }
+.btn { border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 8px; padding: 9px 14px; font-weight: 500; }
+.btn:disabled { opacity: .45; cursor: default; }
+.err { color: #c0362c; font-size: 12.5px; min-height: 1em; margin: 0; }
+
+.who { display: flex; align-items: center; gap: 10px; color: var(--ink-2); margin-bottom: 18px; font-size: 13px; }
+.who .av { width: 26px; height: 26px; font-size: 12px; }
+.who a { color: var(--muted); margin-left: auto; }
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.role { text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: grid; gap: 10px; align-content: start; transition: border-color .15s, box-shadow .15s; }
+.role:hover { border-color: var(--coffee-2); box-shadow: 0 6px 20px rgba(59,36,22,.08); }
+.role .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; }
+.role .ic svg { width: 22px; height: 22px; }
+.role.req .ic { background: #eaf0fd; color: var(--blue); }
+.role.ply .ic { background: var(--cream); color: var(--coffee-2); }
+.role b { font-size: 16px; }
+.role .ko { color: var(--muted); font-size: 12.5px; margin-left: 6px; font-weight: 400; }
+.role p { margin: 0; color: var(--ink-2); font-size: 13px; }
+.role ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 12.5px; }
+.role .go { margin-top: 6px; font-weight: 600; font-size: 13px; color: var(--ink); }
+@media (max-width: 640px) { .roles { grid-template-columns: 1fr; } .card { padding: 22px 18px; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="brand">
+    <div class="logo" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 12.5 8 6.5 11 12.5 14 3.5"/></svg></div>
+    <b>WEMINE</b>
+  </div>
+
+  <!-- Step 1: sign in -->
+  <section class="card" id="step1">
+    <h1>Sign in</h1>
+    <p class="sub">The robot data marketplace: requesters order robot data, players earn credits by playing the simulated tasks.</p>
+    <button class="gbtn" id="gBtn" aria-expanded="false" aria-controls="picker">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+    <div class="picker" id="picker" hidden>
+      <h2>Choose an account</h2>
+      <button class="acct" id="demoAcct"><span class="av">J</span><span><b>Jim</b><small>jimjeff732@gmail.com</small></span></button>
+      <button class="acct" id="otherBtn" aria-expanded="false" aria-controls="other"><span class="av plus">+</span><span><b>Use another account</b></span></button>
+      <form class="other" id="other" hidden>
+        <label>Name<input id="oName" autocomplete="name" required></label>
+        <label>Email<input id="oEmail" type="email" autocomplete="email" required></label>
+        <p class="err" id="oErr"></p>
+        <button class="btn" type="submit">Continue</button>
+      </form>
+    </div>
+    <p class="cap">Demo sign-in — Google OAuth is wired in the production build.</p>
+  </section>
+
+  <!-- Step 2: role -->
+  <section class="card" id="step2" hidden>
+    <div class="who"><span class="av" id="whoAv"></span><span id="whoTxt"></span><a href="#" id="notYou">Not you?</a></div>
+    <h1>How do you want to use WEMINE?</h1>
+    <p class="sub">You can switch roles later from the top bar.</p>
+    <div class="roles">
+      <button class="role req" data-role="requester">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+        <span><b>Data requester</b></span>
+        <p>Order robot training data.</p>
+        <ul><li>Describe robot, task, environment, schema &amp; count</li><li>Agents build the simulation and publish it as a game</li><li>QA-checked episodes, then pay and download</li></ul>
+        <span class="go">Open the console →</span>
+      </button>
+      <button class="role ply" data-role="player">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg></span>
+        <span><b>Player</b></span>
+        <p>Play robot tasks and earn credits.</p>
+        <ul><li>Browse games in the marketplace</li><li>Control the robot in your browser</li><li>Earn credits for every QA-passed episode</li></ul>
+        <span class="go">Open the marketplace →</span>
+      </button>
+    </div>
+  </section>
+</div>
+<script>
+const KEY = "wemine_user";
+const $ = (id) => document.getElementById(id);
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; } };
+const store = (u) => { try { localStorage.setItem(KEY, JSON.stringify(u)); } catch (e) { /* storage blocked: session lasts this page only */ } };
+const clear = () => { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } };
+const params = new URLSearchParams(location.search);
+const ROUTES = { requester: "/requester", player: "/player" };
+
+function go(role) {
+  params.delete("switch");
+  const q = params.toString();  // keeps e.g. Stripe's ?order=…&checkout=… for the console
+  location.replace(ROUTES[role] + (q ? "?" + q : ""));
+}
+
+let user = load();
+if (user && ROUTES[user.role] && !params.has("switch")) go(user.role);
+
+function showRoles(u) {
+  user = u;
+  $("step1").hidden = true; $("step2").hidden = false; $("wrap").classList.add("wide");
+  $("whoAv").textContent = (u.name || u.email).trim()[0].toUpperCase();
+  $("whoTxt").textContent = `${u.name} · ${u.email}`;
+  document.querySelector(".role").focus();
+}
+function signIn(name, email) {
+  const u = { name, email, role: null };
+  store(u); showRoles(u);
+}
+
+$("gBtn").onclick = () => {
+  const open = $("picker").hidden;
+  $("picker").hidden = !open; $("gBtn").setAttribute("aria-expanded", String(open));
+  if (open) $("demoAcct").focus();
+};
+$("demoAcct").onclick = () => signIn("Jim", "jimjeff732@gmail.com");
+$("otherBtn").onclick = () => {
+  const open = $("other").hidden;
+  $("other").hidden = !open; $("otherBtn").setAttribute("aria-expanded", String(open));
+  if (open) $("oName").focus();
+};
+$("other").onsubmit = (e) => {
+  e.preventDefault();
+  const name = $("oName").value.trim(), email = $("oEmail").value.trim();
+  if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $("oErr").textContent = "Enter a name and a valid email."; return; }
+  signIn(name, email);
+};
+$("notYou").onclick = (e) => { e.preventDefault(); clear(); user = null; $("step2").hidden = true; $("step1").hidden = false; $("wrap").classList.remove("wide"); };
+document.querySelectorAll(".role").forEach((b) => b.onclick = () => { store({ ...user, role: b.dataset.role }); go(b.dataset.role); });
+
+// Signed in but choosing (or switching) a role.
+if (user && user.email) showRoles(user);
+</script>
+</body>
+</html>

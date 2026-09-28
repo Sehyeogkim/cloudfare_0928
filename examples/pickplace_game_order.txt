@@ -1,0 +1,3 @@
+Our home robot has to learn to pick items up from the countertop and put them into a cabinet. We need 500 successful episodes,
+teleoperated by people, across a variety of kitchen layouts and interiors.
+We want wrist camera video, joint states and actions. The robot is a single-arm mobile manipulator.

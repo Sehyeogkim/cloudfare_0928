@@ -1,0 +1,49 @@
+{
+  "note": "Placeholder pilot rates for the hackathon demo. Not a real price list.",
+  "currency": "USD",
+  "max_discount_pct": 20,
+  "items": {
+    "scene_setup": {
+      "description": "Cafe scene setup for the order (layouts, styles, cameras, objects)",
+      "unit": "order",
+      "unit_price_usd": 400
+    },
+    "episode": {
+      "description": "QA-passed simulated episode",
+      "unit": "episode",
+      "unit_price_usd": 1.5
+    },
+    "gpu_hour": {
+      "description": "Simulation compute time (MuJoCo)",
+      "unit": "compute hour",
+      "unit_price_usd": 1.2
+    },
+    "failure_repro": {
+      "description": "Failure reproduction and evaluation report",
+      "unit": "order",
+      "unit_price_usd": 300
+    },
+    "qa_report": {
+      "description": "QA report with coverage and reproducibility checks",
+      "unit": "order",
+      "unit_price_usd": 150
+    },
+    "pilot_discount": {
+      "description": "Pilot discount",
+      "unit": "order",
+      "unit_price_usd": null
+    }
+  },
+  "game": {
+    "note": "Placeholder hackathon rates. 1 credit = 1 USD. Approving a spec costs environment_fee_credits; each QA-passed episode a requester buys costs episode_price_credits; the player earns player_share_credits per QA-passed episode. Not a real price list.",
+    "credit_usd": 1.0,
+    "episode_price_credits": 4.0,
+    "llm_placeholder_usd_per_mtok": {
+      "input": 3.0,
+      "output": 15.0,
+      "note": "Used only when an AI episode sidecar gives tokens but no cost_usd. Placeholder: set from the provider's price sheet."
+    },
+    "player_share_credits": 2.5,
+    "environment_fee_credits": 100.0
+  }
+}

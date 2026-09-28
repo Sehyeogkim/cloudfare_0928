@@ -1,0 +1,5 @@
+We are building a barista robot for cafes. We need demonstrations of a robot serving a coffee at a realistic cafe counter:
+pick up the cup of coffee from the counter and put it on the tray next to it.
+Please collect 200 successful episodes with a fixed front view and a wrist camera (128x128), joint states,
+end-effector pose and actions at 20 Hz, in HDF5. A single-arm robot similar to a Franka is fine.
+A few different counter layouts and cafe styles would help.

@@ -1,0 +1,57 @@
+{
+  "mode": "generation",
+  "robot": {
+    "sim_model": "franka_panda",
+    "customer_robot": "UR5e with soft gripper"
+  },
+  "task": "tomato_pregrasp",
+  "scene_template": "greenhouse_tomato_v1",
+  "reference_failure": null,
+  "randomization": {
+    "leaf_occlusion": {
+      "min": 0.0,
+      "max": 0.8
+    },
+    "fruit_position_offset_m": {
+      "min": -0.08,
+      "max": 0.08
+    },
+    "lighting_lux": {
+      "min": 500.0,
+      "max": 20000.0
+    },
+    "camera_pose_offset_m": {
+      "min": 0.0,
+      "max": 0.03
+    }
+  },
+  "episode_count": 200,
+  "sensors": [
+    "rgb",
+    "depth",
+    "instance_segmentation",
+    "joint_state",
+    "action"
+  ],
+  "success_rule": {
+    "type": "pregrasp_reached",
+    "position_tolerance_m": 0.02,
+    "time_limit_s": 20.0,
+    "forbid_collisions": true
+  },
+  "output_format": "hdf5",
+  "assumptions": [
+    "episode_count set to the default of 200 since no scale was specified",
+    "leaf_occlusion randomized over 0.0-0.8 (unoccluded to heavily hidden) to give 'lots of variety'",
+    "fruit_position_offset_m randomized over ±0.08 m since no specific hanging-position range was given",
+    "lighting_lux randomized over 500-20000 lux to span dawn through midday greenhouse light, since no measured values were given",
+    "camera_pose_offset_m randomized over 0-0.03 m to represent the wrist camera's 'few centimeters' post-maintenance shift",
+    "'segmentation' interpreted as instance_segmentation",
+    "success_rule left at defaults: 0.02 m tolerance, 20 s time limit, collisions forbidden"
+  ],
+  "out_of_scope": [
+    "Real-robot performance guarantees on your UR5e arm with soft gripper (simulation uses a Franka Panda arm/gripper as proxy)",
+    "Stem cutting, fruit detachment/damage physics",
+    "Crops or scenes other than greenhouse_tomato_v1"
+  ]
+}

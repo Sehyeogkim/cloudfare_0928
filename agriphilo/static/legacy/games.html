@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agriphilo Game Orders</title>
+<style>
+:root{--bg:#eef3ef;--card:#fff;--line:#d3e0d6;--ink:#15291f;--muted:#5a6f63;--acc:#1b7652;--acc2:#13563c;--pass:#147a4f;--fail:#b23930;--warn:#8a5a00;--soft:#f2f7f3;
+font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;color:var(--ink);background:var(--bg)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg)}button,textarea,input{font:inherit}
+button{cursor:pointer;border:1px solid #a9cbb7;border-radius:8px;background:#fff;color:var(--ink);padding:7px 12px}
+button:hover{background:#e4f6e9}button:disabled{opacity:.5;cursor:default}button.primary{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}button.primary:hover{background:var(--acc2)}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #2b84cf;outline-offset:2px}
+.shell{max-width:1320px;margin:auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}h1{font-size:22px;margin:0}
+.pill{display:inline-block;border-radius:999px;background:#fff1cf;color:#754c07;padding:4px 10px;font-size:12px;font-weight:800}
+.spacer{flex:1}a{color:var(--acc)}
+.wallet{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.stat{background:var(--soft);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted)}.stat b{display:block;color:var(--ink);font-size:17px;font-variant-numeric:tabular-nums}
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+h2{font-size:15px;margin:0 0 10px}h3{font-size:13px;margin:14px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
+.ex{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.ex button{font-size:12px;padding:4px 8px}
+.glist{display:grid;gap:6px;margin-top:12px}.gitem{text-align:left;width:100%;padding:8px}.gitem.sel{border-color:var(--acc);box-shadow:0 0 0 2px #1b765233}
+.gitem small{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status{font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;background:#e6efe8}
+.status.active{background:#dff3e6;color:var(--pass)}.status.failed{background:#fbe3e1;color:var(--fail)}.status.awaiting_approval{background:#fff1cf;color:var(--warn)}
+.steps{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}.step{font-size:12px;padding:4px 9px;border-radius:999px;background:#e8eee9;color:var(--muted)}.step.on{background:var(--acc);color:#fff}.step.done{background:#cfe8d8;color:var(--acc2)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:4px 10px;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0;overflow-wrap:anywhere}
+.play{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
+iframe{width:100%;height:380px;border:0;border-radius:8px;background:#000}
+.placeholder{background:var(--soft);border:1px dashed #9fbfab;border-radius:8px;padding:14px;font-size:13px;color:var(--muted);line-height:1.5}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.tbl{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #e6ece7;vertical-align:top}th{background:var(--soft);position:sticky;top:0}
+.pass{color:var(--pass);font-weight:800}.fail{color:var(--fail);font-weight:800}.muted{color:var(--muted)}.err{color:var(--fail);font-weight:700}
+.ai-ep{border-top:1px solid var(--line);padding:8px 0;font-size:13px}.ai-ep:first-child{border-top:0}
+ol.plan{margin:4px 0;padding-left:18px}.reason{white-space:pre-wrap;color:var(--muted);font-size:12px;max-height:120px;overflow:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.play{grid-template-columns:1fr}.kv{grid-template-columns:110px 1fr}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header>
+  <h1>Game orders</h1><span class="pill">TEST MODE · no real payment</span>
+  <div class="spacer"></div><a href="/">Orders console</a>
+</header>
+
+<section class="wallet" aria-label="Customer wallet">
+  <div class="stat">Wallet available<b id="wAvail">—</b></div>
+  <div class="stat">Held for orders<b id="wHeld">—</b></div>
+  <div class="stat">Human payable<b id="wPay">—</b></div>
+  <div class="stat">AI budget net<b id="wAi">—</b></div>
+  <div class="stat">Platform fee<b id="wFee">—</b></div>
+  <div class="stat">LLM spend<b id="wLlm">—</b></div>
+  <div class="spacer"></div>
+  <button id="topup100">+100 credits</button><button class="primary" id="topup1000">Top up 1,000 credits (Stripe test)</button>
+</section>
+
+<div class="layout">
+  <aside class="card">
+    <h2>1 · Customer order</h2>
+    <textarea id="orderText" aria-label="Order text" placeholder="Robot, task, environment, data you need, how many episodes"></textarea>
+    <div class="ex" id="examples"></div>
+    <button class="primary" id="createBtn">Send to agents</button>
+    <p class="err" id="createErr"></p>
+    <div class="glist" id="gameList"></div>
+  </aside>
+  <section class="card" id="detail"><p class="muted">Create or pick a game order.</p></section>
+</div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cr = x => x == null ? "—" : Number(x).toLocaleString(undefined, {maximumFractionDigits: 2});
+let selected = null, serverUrl = "", timer = null;
+
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+async function loadWallet() {
+  const w = await api("/api/wallet");
+  $("wAvail").textContent = cr(w.available);
+  $("wHeld").textContent = cr(w.held);
+  const sum = o => Object.values(o).reduce((a, b) => a + b, 0);
+  $("wPay").textContent = cr(sum(w.payable));
+  $("wAi").textContent = cr(sum(w.ai_budget));
+  $("wFee").textContent = cr(w.platform_fee);
+  $("wLlm").textContent = cr(w.llm_spend);
+}
+async function topup(n) { await api("/api/wallet/topup", {amount: n}); await refresh(); }
+$("topup100").onclick = () => topup(100);
+$("topup1000").onclick = () => topup(1000);
+
+async function loadExamples() {
+  const ex = await api("/api/examples");
+  const box = $("examples");
+  for (const [k, v] of Object.entries(ex)) {
+    if (!k.includes("game")) continue;
+    const b = document.createElement("button");
+    b.textContent = k.replace("_order", "").replace("_", " ");
+    b.onclick = () => { $("orderText").value = v; };
+    box.appendChild(b);
+  }
+}
+
+$("createBtn").onclick = async () => {
+  $("createErr").textContent = "";
+  try {
+    const g = await api("/api/games", {text: $("orderText").value});
+    selected = g.id; await refresh();
+  } catch (e) { $("createErr").textContent = e.message; }
+};
+
+async function loadList() {
+  const j = await api("/api/games");
+  serverUrl = j.game_server_url;
+  $("gameList").innerHTML = j.items.map(g => `<button class="gitem ${g.id === selected ? "sel" : ""}" data-id="${g.id}">
+    <span class="status ${g.status}">${esc(g.status.replace("_", " "))}</span> <b>${esc(g.task || "designing…")}</b>
+    <small>${esc(g.order_text)}</small></button>`).join("");
+  document.querySelectorAll(".gitem").forEach(b => b.onclick = () => { selected = b.dataset.id; refresh(); });
+  if (!selected && j.items.length) selected = j.items[0].id;
+}
+
+const STEPS = [["designing", "2 · Agents design game"], ["awaiting_approval", "3 · Approve & hold credits"], ["active", "4 · Play → QA → capture"], ["closed", "5 · Close & release"]];
+
+function stepsHtml(status) {
+  const i = STEPS.findIndex(s => s[0] === status);
+  return `<div class="steps">${STEPS.map((s, k) => `<span class="step ${k === i ? "on" : k < i ? "done" : ""}">${s[1]}</span>`).join("")}</div>`;
+}
+
+function humanPanel(g) {
+  const s = g.spec;
+  if (g.status !== "active") return `<div class="placeholder">Approve the order to open play.</div>`;
+  if (!serverUrl) return `<div class="placeholder"><b>Game server not connected.</b><br>Set <code>AGRIPHILO_GAME_SERVER_URL</code> and restart this server.
+    The game server must write episodes to <code>${esc(g.episode_dir)}/</code> with <code>player_kind="human"</code>.</div>`;
+  const u = new URL(serverUrl);
+  u.searchParams.set("game_id", g.id); u.searchParams.set("task", s.task); u.searchParams.set("robot", s.robot);
+  u.searchParams.set("layout_ids", s.layout_ids.join(",")); u.searchParams.set("style_ids", s.style_ids.join(","));
+  const player = new URL(u); player.searchParams.set("role", "player");
+  u.searchParams.set("role", "viewer");
+  return `<iframe src="${esc(u.href)}" title="Human play (live view)" allow="fullscreen"></iframe>
+    <div class="row" style="margin-top:6px"><span class="muted">Live view of the player's session.</span>
+    <a href="${esc(player.href)}" target="_blank" rel="noopener">Open player view ↗</a></div>`;
+}
+
+function aiPanel(g) {
+  const eps = g.episodes.filter(e => e.player_kind === "ai");
+  if (!eps.length) return `<div class="placeholder">No AI episode yet. The LLM player writes to <code>${esc(g.episode_dir)}/</code>
+    with <code>player_kind="ai"</code> and a JSON sidecar holding its plan, reasoning and token usage.</div>`;
+  return eps.map(e => `<div class="ai-ep"><div class="row"><b class="mono">${esc(e.episode_id)}</b>
+    <span class="${e.passed ? "pass" : "fail"}">${e.passed ? "QA pass" : "QA fail"}</span>
+    <span class="muted">${esc(e.player_id)}</span>
+    ${e.billing?.token_cost != null ? `<span class="muted">tokens ${cr(e.billing.token_cost)} cr</span>` : ""}</div>
+    ${Array.isArray(e.plan) ? `<ol class="plan">${e.plan.map(p => `<li>${esc(typeof p === "string" ? p : JSON.stringify(p))}</li>`).join("")}</ol>` : e.plan ? `<div class="reason">${esc(JSON.stringify(e.plan))}</div>` : ""}
+    ${e.reasoning ? `<div class="reason">${esc(e.reasoning)}</div>` : ""}</div>`).join("");
+}
+
+function episodesTable(g) {
+  const files = Object.entries(g.files).filter(([, f]) => f.status !== "done");
+  const pending = files.length ? `<p class="muted">${files.map(([n, f]) => `${esc(n)}: ${esc(f.status)}${f.error ? " — " + esc(f.error) : ""}`).join("<br>")}</p>` : "";
+  if (!g.episodes.length) return pending + `<p class="muted">No episode files in <code>${esc(g.episode_dir)}/</code> yet.</p>`;
+  return pending + `<div class="tbl"><table><thead><tr><th>Episode</th><th>Player</th><th>Steps</th><th>QA</th><th>Reasons</th><th>Replay</th><th>Charged</th></tr></thead><tbody>
+  ${g.episodes.map(e => `<tr><td class="mono">${esc(e.episode_id)}</td><td>${esc(e.player_kind)} · ${esc(e.player_id)}</td><td>${e.steps}</td>
+    <td class="${e.passed ? "pass" : "fail"}">${e.passed ? "pass" : "fail"}</td>
+    <td>${e.reasons.length ? e.reasons.map(esc).join("<br>") : "—"}</td>
+    <td>${e.replay_checked ? `yes · qpos err ${cr(e.metrics.replay_max_qpos_err ?? e.metrics.max_qpos_err)}` : `<span class="muted">${esc(e.replay_note || "no")}</span>`}</td>
+    <td>${e.billing.charged ? `${cr(e.billing.charged)} cr<br><span class="muted">player ${cr(e.billing.player_share)} · fee ${cr(e.billing.platform_fee)}</span>` : `<span class="muted">${esc(e.billing.note || "0")}</span>`}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+function ledgerTable(g) {
+  if (!g.ledger.length) return `<p class="muted">No ledger entries for this order yet.</p>`;
+  return `<div class="tbl"><table><thead><tr><th>Time</th><th>Kind</th><th>Key</th><th>Moves</th></tr></thead><tbody>
+  ${g.ledger.slice().reverse().map(e => `<tr><td>${esc(e.at.slice(11))}</td><td>${esc(e.kind)}</td><td class="mono">${esc(e.idempotency_key)}</td>
+    <td class="mono">${Object.entries(e.deltas).map(([a, d]) => `${esc(a)} ${d > 0 ? "+" : ""}${cr(d)}`).join("<br>")}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function render(g) {
+  const s = g.spec;
+  let h = `<h2>Order ${esc(g.id)} <span class="status ${g.status}">${esc(g.status.replace("_", " "))}</span></h2>${stepsHtml(g.status)}`;
+  h += `<p class="muted" style="white-space:pre-wrap">${esc(g.order_text)}</p>`;
+  if (g.status === "designing") h += `<p>Game Environment Agent is turning the order into a GameSpec…</p>`;
+  if (g.error) h += `<p class="err">${esc(g.error)}</p>`;
+  if (s) {
+    h += `<h3>GameSpec from the Environment Agent</h3><dl class="kv">
+      <dt>Task</dt><dd><b>${esc(s.task)}</b></dd><dt>Robot</dt><dd>${esc(s.robot)}</dd>
+      <dt>Kitchens</dt><dd>layouts ${esc(s.layout_ids.join(", "))} · styles ${esc(s.style_ids.join(", "))}</dd>
+      <dt>Cameras</dt><dd>${s.cameras.map(c => `${esc(c.name)} ${c.width}×${c.height}@${c.fps}`).join(", ")}</dd>
+      <dt>Control</dt><dd>${s.control_hz} Hz · max ${s.max_steps} steps · time limit ${s.success_rule.time_limit_s}s</dd>
+      <dt>Episodes</dt><dd>${g.progress.passed} passed / ${s.episodes_requested} requested (${g.progress.total} received)</dd>
+      <dt>Price</dt><dd>${cr(g.price_per_episode)} cr per QA-passed episode · player ${cr(s.credit_per_pass)} · hold ${cr(g.hold_amount)} cr · left ${cr(g.hold_left)}</dd>
+      <dt>Rationale</dt><dd class="muted">${esc(g.summary)} ${esc(s.rationale)}</dd></dl>`;
+    h += `<div class="row" style="margin-top:10px">`;
+    if (g.status === "awaiting_approval") h += `<button class="primary" id="approveBtn">Approve & hold ${cr(g.hold_amount)} credits</button>`;
+    if (g.status === "active" || g.status === "awaiting_approval") h += `<button id="closeBtn">Close order${g.status === "active" ? " & release hold" : ""}</button>`;
+    h += `<span class="err" id="actErr"></span></div>`;
+    h += `<h3>Play</h3><div class="play"><div class="panel"><h2>Human play</h2>${humanPanel(g)}</div><div class="panel"><h2>AI play (LLM)</h2>${aiPanel(g)}</div></div>`;
+    h += `<h3>Episodes · QA</h3>${episodesTable(g)}<h3>Ledger for this order</h3>${ledgerTable(g)}`;
+  }
+  const det = $("detail");
+  const keepIframe = det.querySelector("iframe");
+  det.innerHTML = h;
+  if (keepIframe) { const n = det.querySelector("iframe"); if (n && n.src === keepIframe.src) n.replaceWith(keepIframe); }
+  const act = async a => { try { await api(`/api/games/${g.id}/${a}`, {}); await refresh(); } catch (e) { $("actErr").textContent = e.message; } };
+  if ($("approveBtn")) $("approveBtn").onclick = () => act("approve");
+  if ($("closeBtn")) $("closeBtn").onclick = () => act("close");
+}
+
+async function refresh() {
+  try {
+    await Promise.all([loadWallet(), loadList()]);
+    if (selected) render(await api(`/api/games/${selected}`));
+  } catch (e) { console.error(e); }
+}
+loadExamples(); refresh(); timer = setInterval(refresh, 2000);
+</script>
+</body>
+</html>

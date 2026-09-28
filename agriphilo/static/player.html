@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WEMINE · Player</title>
+<style>
+  :root { color-scheme: light; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17211c; background: #f7f8f6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  header { padding: 18px clamp(18px, 5vw, 64px); background: white; border-bottom: 1px solid #e3e8e2; display: flex; align-items: center; gap: 18px; }
+  header strong { font-size: 20px; letter-spacing: .04em; }
+  header a { color: #246543; text-decoration: none; }
+  main { max-width: 1100px; margin: auto; padding: 48px 20px; }
+  h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 42px); }
+  p { color: #59645d; line-height: 1.55; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin-top: 30px; }
+  .card { background: white; border: 1px solid #e0e7df; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 20px #15201708; }
+  .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #e7ece6; }
+  .card .body { padding: 18px; }
+  .card h2 { margin: 0 0 6px; font-size: 19px; }
+  .card p { margin: 0 0 16px; }
+  .meta { font-size: 13px; }
+  .button { display: inline-block; background: #1c7650; color: white; border-radius: 8px; padding: 10px 16px; text-decoration: none; font-weight: 650; }
+  .button:hover { background: #165d3f; }
+  .button.disabled { background: #dbe1dc; color: #66716a; pointer-events: none; }
+  .note { background: #edf5ef; border: 1px solid #d7e6da; border-radius: 10px; padding: 16px; }
+</style>
+</head>
+<body>
+<header><strong>WEMINE</strong><a href="/requester">Requester console</a><a href="/?switch=1">Switch role</a></header>
+<main>
+  <h1>Play a task. Make a demonstration.</h1>
+  <p>Control a simulated café robot. Submitted episodes are checked before they become requester data.</p>
+  <div id="message" class="note">Loading games…</div>
+  <div id="games" class="grid"></div>
+</main>
+<script>
+const message = document.getElementById('message');
+const games = document.getElementById('games');
+function addCard(item) {
+  const card = document.createElement('article');
+  card.className = 'card';
+  if (item.scene_image_url) {
+    const image = document.createElement('img');
+    image.src = item.scene_image_url;
+    image.alt = 'Café simulation scene';
+    card.append(image);
+  }
+  const body = document.createElement('div');
+  body.className = 'body';
+  const title = document.createElement('h2');
+  title.textContent = item.title;
+  const description = document.createElement('p');
+  description.textContent = `${item.robot} · ${item.scene}`;
+  const meta = document.createElement('p');
+  meta.className = 'meta';
+  meta.textContent = `${item.episodes_passed}/${item.episodes_wanted} QA-passed episodes · ${item.status}`;
+  const link = document.createElement('a');
+  link.className = `button${item.status === 'open' && item.play_url ? '' : ' disabled'}`;
+  link.href = item.play_url || '#';
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.textContent = item.status === 'open' ? 'Play game →' : 'Closed';
+  body.append(title, description, meta, link);
+  card.append(body);
+  games.append(card);
+}
+Promise.all([
+  fetch('/api/marketplace').then(r => r.json()),
+  fetch('/api/games').then(r => r.json())
+]).then(([market, config]) => {
+  const items = market.items || [];
+  items.forEach(addCard);
+  if (items.length) {
+    message.textContent = config.game_server_url
+      ? 'Choose an open game below. The game opens in a new tab.'
+      : 'Start the MuJoCo game server and set AGRIPHILO_GAME_SERVER_URL before starting this console.';
+  } else if (config.game_server_url) {
+    message.textContent = 'No requester games are published yet. Try the café pilot directly: ';
+    const link = document.createElement('a');
+    link.className = 'button';
+    link.href = `${config.game_server_url.replace(/\/$/, '')}/?role=player`;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'Play café pilot →';
+    message.append(link);
+  } else {
+    message.textContent = 'No games are published yet. Start the game server on port 8010, connect it to this console, or create a requester order.';
+  }
+}).catch(() => { message.textContent = 'Could not load games. Refresh after the WEMINE server starts.'; });
+</script>
+</body>
+</html>

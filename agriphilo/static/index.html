@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WEMINE Console</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fbfbfa; --panel: #ffffff; --side: #f4f4f2; --ink: #17181a; --ink-2: #4b4f55; --muted: #8a8f96;
+  --line: #e7e7e4; --line-2: #efefec; --hover: #f0f0ed; --accent: #1f7a4d; --accent-2: #e6f2eb;
+  --blue: #2b5fd9; --blue-bg: #eaf0fd; --amber: #a15c07; --amber-bg: #fdf3e2; --red: #c0362c; --red-bg: #fdeceb;
+  --green: #1f7a4d; --green-bg: #e6f2eb;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13.5px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: var(--blue); }
+button:focus-visible, textarea:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+[hidden] { display: none !important; }
+
+.app { display: grid; grid-template-columns: 232px 1fr; height: 100vh; }
+/* sidebar */
+.side { background: var(--side); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 12px 10px; gap: 2px; min-height: 0; }
+.ws { display: flex; align-items: center; gap: 10px; padding: 6px 8px 14px; }
+.logo { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #c47a2c, #3b2416); display: grid; place-items: center; color: #fff; flex: none; }
+.logo svg { width: 16px; height: 16px; }
+.ws b { display: block; font-size: 13.5px; }
+.ws small { color: var(--muted); font-size: 12px; }
+.nav-h { font-size: 11.5px; color: var(--muted); padding: 12px 8px 4px; font-weight: 500; }
+.nav { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); border: 0; background: none; width: 100%; text-align: left; }
+.nav:hover { background: var(--hover); }
+.nav.on { background: #e9e9e5; color: var(--ink); font-weight: 500; }
+.nav .count { margin-left: auto; font-size: 12px; color: var(--muted); }
+.nav .hotpill { display: inline-block; background: var(--amber); color: #fff; font-size: 10.5px; font-weight: 700; border-radius: 999px; padding: 0 6px; margin-right: 6px; line-height: 16px; }
+.content.split .wide-only { display: none; }
+.nav svg { width: 15px; height: 15px; flex: none; }
+.side-foot { margin-top: auto; padding: 10px 8px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); display: grid; gap: 3px; }
+.side-foot .live { display: flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.side-foot .live i { width: 7px; height: 7px; border-radius: 50%; background: #2fa565; flex: none; }
+
+/* main */
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.top { height: 52px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 20px; border-bottom: 1px solid var(--line); background: var(--panel); min-width: 0; }
+.top h1 { font-size: 14px; font-weight: 600; margin: 0; white-space: nowrap; }
+.top select { display: none; font: inherit; font-weight: 600; border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; background: var(--panel); }
+.demo-pill { font-size: 11.5px; font-weight: 600; color: var(--amber); background: var(--amber-bg); border: 1px solid #f3dcb3; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.tabs { display: flex; gap: 2px; margin-left: 6px; min-width: 0; overflow-x: auto; }
+.tab { border: 1px solid transparent; background: none; padding: 4px 10px; border-radius: 6px; color: var(--ink-2); font-size: 13px; white-space: nowrap; }
+.tab:hover { background: var(--hover); }
+.tab.on { background: var(--panel); border-color: var(--line); color: var(--ink); box-shadow: 0 1px 1px rgba(0,0,0,.04); }
+.tab .n { color: var(--muted); margin-left: 4px; }
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 7px; padding: 6px 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); white-space: nowrap; }
+.btn:hover:not(:disabled) { background: var(--hover); }
+.btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn.primary:hover:not(:disabled) { background: #2d2f33; }
+.btn.go { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.go:hover:not(:disabled) { background: #19663f; }
+.btn.sm { padding: 3px 9px; font-size: 12.5px; }
+.user { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.user .av { width: 24px; height: 24px; border-radius: 50%; background: #3b2416; color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 11.5px; }
+.user a { color: var(--muted); text-decoration: none; } .user a:hover { color: var(--ink); text-decoration: underline; }
+@media (max-width: 720px) { .user .nm, .user .sep { display: none; } }
+.btn:disabled { opacity: .45; cursor: default; }
+.kbd { font-size: 11px; color: #b9bcc0; border: 1px solid #45484d; border-radius: 4px; padding: 0 4px; }
+.spacer { flex: 1; }
+
+.content { flex: 1; display: grid; grid-template-columns: 1fr; min-height: 0; }
+.content.split { grid-template-columns: minmax(0, 1fr) 580px; }
+.list { overflow: auto; min-height: 0; }
+table { width: 100%; border-collapse: collapse; }
+.list th { position: sticky; top: 0; z-index: 1; background: var(--bg); text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.list td { padding: 11px 12px; border-bottom: 1px solid var(--line-2); vertical-align: middle; }
+.list th:first-child, .list td:first-child { padding-left: 20px; }
+.list th:last-child, .list td:last-child { padding-right: 20px; }
+tr.row { cursor: pointer; }
+tr.row:hover td { background: var(--hover); }
+tr.row.sel td { background: #eef2fb; }
+td.id { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+td.req { max-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+td.sub { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.stage-c { white-space: nowrap; color: var(--ink-2); font-size: 12.5px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; font-family: var(--font); }
+.badge i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.b-blue { color: var(--blue); background: var(--blue-bg); }
+.b-run i { animation: pulse 1.2s infinite; }
+.b-amber { color: var(--amber); background: var(--amber-bg); }
+.b-green { color: var(--green); background: var(--green-bg); }
+.b-red { color: var(--red); background: var(--red-bg); }
+.b-gray { color: var(--ink-2); background: var(--line-2); }
+.mode { font-size: 12px; color: var(--ink-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+.empty { display: grid; place-items: center; height: 100%; padding: 40px 16px; text-align: center; }
+.empty .box { max-width: 400px; }
+.empty h2 { font-size: 16px; margin: 14px 0 6px; }
+.empty p { color: var(--ink-2); margin: 0 0 18px; }
+.empty .ill { width: 56px; height: 56px; margin: 0 auto; border-radius: 14px; background: var(--accent-2); display: grid; place-items: center; color: var(--accent); }
+.none { color: var(--muted); padding: 28px 20px; }
+
+/* detail */
+.detail { border-left: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.d-head { padding: 16px 20px 0; flex: none; }
+.d-meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; font-family: var(--mono); }
+.d-meta .x { margin-left: auto; border: 0; background: none; color: var(--muted); padding: 4px 6px; border-radius: 5px; font-family: var(--font); }
+.d-meta .x:hover { background: var(--hover); color: var(--ink); }
+.d-title { font-size: 15.5px; font-weight: 600; margin: 8px 0 12px; line-height: 1.35; overflow-wrap: anywhere; }
+.pipe { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; margin-bottom: 12px; }
+.pipe div { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pipe div::before { content: ""; display: block; height: 4px; border-radius: 2px; background: var(--line); margin-bottom: 6px; }
+.pipe .done { color: var(--ink-2); }
+.pipe .done::before { background: var(--accent); }
+.pipe .running { color: var(--blue); font-weight: 500; }
+.pipe .running::before { background: linear-gradient(90deg, var(--blue) 50%, #c9d7f7 50%); background-size: 200% 100%; animation: slide 1.4s linear infinite; }
+.pipe .waiting { color: var(--amber); font-weight: 500; }
+.pipe .waiting::before { background: #f0c27a; }
+.pipe .failed { color: var(--red); font-weight: 500; }
+.pipe .failed::before { background: var(--red); }
+@keyframes slide { to { background-position: -200% 0; } }
+.actbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
+.actbar.warn { background: var(--amber-bg); color: #7a4505; }
+.actbar.info { background: var(--blue-bg); color: #1c3f91; }
+.actbar.ok { background: var(--green-bg); color: #155436; }
+.actbar.err { background: var(--red-bg); color: #8e241c; }
+.actbar .msg-t { flex: 1; min-width: 180px; }
+.d-tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); padding: 0 20px; overflow-x: auto; flex: none; scrollbar-width: none; }
+.d-tabs::-webkit-scrollbar { display: none; }
+.d-tab { border: 0; background: none; padding: 9px 0; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 500; white-space: nowrap; display: inline-flex; gap: 5px; align-items: center; }
+.d-tab.on { color: var(--ink); border-bottom-color: var(--ink); }
+.d-tab .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+.d-body { flex: 1; overflow: auto; padding: 18px 20px 28px; min-height: 0; }
+
+.banner { display: flex; gap: 10px; align-items: flex-start; border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; font-size: 13px; }
+.banner.info { background: var(--blue-bg); color: #1c3f91; }
+.banner.warn { background: var(--amber-bg); color: #7a4505; }
+.banner.err { background: var(--red-bg); color: #8e241c; }
+.banner.ok { background: var(--green-bg); color: #155436; }
+.banner.muted { background: var(--bg); border: 1px solid var(--line); color: var(--ink-2); }
+.spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: rot .8s linear infinite; flex: none; margin-top: 2px; }
+@keyframes rot { to { transform: rotate(360deg); } }
+.caption { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+
+.wallet { margin: 18px 20px 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 16px; }
+.wallet-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.wallet-bal { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.wallet-bal small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+.packs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.ledger { margin-top: 14px; font-size: 12.5px; }
+.ledger td { padding: 4px 0; border-top: 1px solid var(--line-2); }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 18px; }
+.kpi { padding: 10px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
+.kpi:nth-child(3n) { border-right: 0; }
+.kpi:nth-last-child(-n+3) { border-bottom: 0; }
+.kpi small { display: block; color: var(--muted); font-size: 11.5px; }
+.kpi b { font-weight: 600; font-size: 14px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sec { margin-bottom: 22px; }
+.sec h3 { font-size: 12px; font-weight: 600; color: var(--ink-2); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; }
+.rng { display: grid; grid-template-columns: 150px 1fr 130px; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line-2); }
+.rng:last-child { border-bottom: 0; }
+.rng .track { height: 6px; background: var(--line-2); border-radius: 3px; position: relative; }
+.rng .fill { position: absolute; top: 0; bottom: 0; background: var(--accent); border-radius: 3px; }
+.rng .val { text-align: right; font-family: var(--mono); font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; background: var(--bg); }
+ul.lst { margin: 0; padding-left: 18px; color: var(--ink-2); }
+ul.lst li { margin: 3px 0; }
+.kv { color: var(--ink-2); }
+.cond { display: flex; gap: 8px; padding: 6px 0; }
+.cond .mode { flex: none; height: fit-content; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+.grid2 div small { display: block; color: var(--muted); font-size: 11.5px; }
+.grid2 div b { font-weight: 500; }
+
+/* summaries, timeline, feed */
+.says { display: grid; gap: 8px; }
+.say { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.say small { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11.5px; font-weight: 500; margin-bottom: 2px; }
+.say small i { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); color: #fff; font-style: normal; font-size: 9px; display: grid; place-items: center; font-weight: 700; }
+.tl { position: relative; }
+.st { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 8px 0; align-items: start; }
+.st + .st { border-top: 1px solid var(--line-2); }
+.ico { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; border: 1.5px solid var(--line); color: var(--muted); background: var(--panel); margin-top: 1px; }
+.ico.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ico.running { border-color: var(--blue); border-right-color: transparent; animation: rot .9s linear infinite; }
+.ico.waiting { border-color: #e2a34a; background: var(--amber-bg); color: var(--amber); }
+.ico.failed { background: var(--red); border-color: var(--red); color: #fff; }
+.st .nm { font-weight: 500; }
+.st .nm span { color: var(--muted); font-weight: 400; margin-left: 6px; font-size: 12.5px; }
+.st .dt { color: var(--ink-2); font-size: 12.5px; overflow-wrap: anywhere; }
+.st .er { color: var(--red); font-size: 12.5px; overflow-wrap: anywhere; }
+.st .th { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+.st .dur { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.feed { display: grid; gap: 0; }
+.ev { display: grid; grid-template-columns: 70px 92px 1fr; gap: 8px; padding: 5px 0; font-size: 12.5px; border-bottom: 1px dashed var(--line-2); }
+.ev .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+.ev .s { color: var(--ink-2); font-weight: 500; }
+.ev .x { color: var(--ink); overflow-wrap: anywhere; }
+
+/* tables in detail */
+.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.tbl th { text-align: left; font-weight: 500; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl td { padding: 6px 8px; border-bottom: 1px solid var(--line-2); vertical-align: top; }
+.tbl td.r, .tbl th.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl td.m { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
+.tbl tr.tot td { border-bottom: 0; font-weight: 600; font-size: 14px; padding-top: 10px; }
+.tbl tr.subt td { color: var(--ink-2); }
+.scroll-x { overflow-x: auto; }
+.st-i { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; font-size: 10px; font-weight: 700; color: #fff; }
+.st-i.pass { background: var(--accent); }
+.st-i.warn { background: #d9922b; }
+.st-i.fail { background: var(--red); }
+.cat { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; padding-top: 12px !important; }
+
+/* coverage */
+.cov { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cov-c { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.cov-c b { font-weight: 500; font-size: 12.5px; }
+.bars { display: flex; align-items: flex-end; gap: 4px; height: 56px; margin: 8px 0 4px; }
+.bars div { flex: 1; background: #b8dcc6; border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+.bars div.zero { background: var(--red-bg); outline: 1px dashed #e8a29c; }
+.bars-l { display: flex; gap: 4px; }
+.bars-l span { flex: 1; text-align: center; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bars-x { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+/* scene */
+.preview { width: 100%; border-radius: 8px; border: 1px solid var(--line); image-rendering: pixelated; display: block; background: var(--bg); }
+.preview.real { image-rendering: auto; }
+.frame16 { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid var(--line); }
+.frame16 iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.frame16 .ph { position: absolute; inset: 0; display: grid; place-items: center; color: #c9ccd1; font-size: 13px; padding: 16px; text-align: center; }
+ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 4px; }
+ol.steps li { counter-increment: s; display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; color: var(--ink-2); }
+ol.steps li::before { content: counter(s); flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: var(--accent-2); color: var(--accent); }
+.flow { display: grid; gap: 0; }
+.flow .fs { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line-2); }
+.flow .fs:last-child { border-bottom: 0; }
+.flow .fs b { font-weight: 500; }
+.flow .fs small { display: block; color: var(--muted); font-size: 12px; }
+.flow .fs .who { color: var(--muted); font-weight: 400; margin-left: 6px; font-size: 12.5px; }
+.bigbtn { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.prog { height: 8px; background: var(--line-2); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
+.prog div { height: 100%; background: var(--blue); border-radius: 4px; transition: width .4s; }
+
+/* conversation */
+.msgs { display: flex; flex-direction: column; gap: 14px; }
+.msg { display: flex; gap: 10px; }
+.av { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 10.5px; font-weight: 600; }
+.av.c { background: #e3e4e8; color: var(--ink-2); }
+.av.a { background: var(--accent); color: #fff; }
+.msg .who { font-size: 12.5px; font-weight: 600; }
+.msg .who span { color: var(--muted); font-weight: 400; margin-left: 6px; }
+.msg .txt { white-space: pre-wrap; color: var(--ink); margin-top: 2px; overflow-wrap: anywhere; }
+.msg ol { margin: 4px 0 0; padding-left: 18px; white-space: normal; }
+.composer { border: 1px solid var(--line); border-radius: 10px; margin-top: 18px; background: var(--panel); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.composer textarea { width: 100%; border: 0; resize: none; min-height: 84px; padding: 12px; font: inherit; background: none; outline: none; display: block; }
+.composer .bar { display: flex; align-items: center; padding: 8px; border-top: 1px solid var(--line-2); color: var(--muted); font-size: 12px; gap: 8px; }
+pre { margin: 0; font: 11.5px/1.55 var(--mono); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow: auto; }
+
+/* files */
+.files { display: grid; gap: 8px; }
+.file { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.file .fi { width: 32px; height: 32px; border-radius: 7px; background: var(--accent-2); color: var(--accent); display: grid; place-items: center; font-size: 10px; font-weight: 700; flex: none; font-family: var(--mono); }
+.file .fn { flex: 1; min-width: 0; }
+.file .fn b { font-weight: 500; font-family: var(--mono); font-size: 12.5px; }
+.file .fn small { display: block; color: var(--muted); font-size: 12px; }
+.lock { text-align: center; padding: 28px 12px; border: 1px dashed var(--line); border-radius: 10px; color: var(--ink-2); }
+.lock b { display: block; font-size: 14px; margin-bottom: 4px; color: var(--ink); }
+
+/* modal */
+.scrim { position: fixed; inset: 0; background: rgba(20, 22, 25, .35); display: none; align-items: flex-start; justify-content: center; padding: 10vh 16px 16px; z-index: 10; }
+.scrim.open { display: flex; }
+.modal { width: 100%; max-width: 620px; background: var(--panel); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.2); overflow: hidden; }
+.m-head { display: flex; align-items: center; gap: 8px; padding: 14px 16px 0; color: var(--muted); font-size: 12.5px; flex-wrap: wrap; }
+.m-head b { color: var(--ink); font-weight: 600; }
+.modal textarea { width: 100%; border: 0; resize: vertical; min-height: 170px; padding: 12px 16px; font: 14px/1.55 var(--font); outline: none; display: block; }
+.m-ex { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 16px 12px; }
+.m-ex button { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--ink-2); }
+.m-ex button:hover { background: var(--hover); }
+.m-foot { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg); flex-wrap: wrap; }
+.m-foot label { display: flex; gap: 6px; align-items: center; color: var(--ink-2); font-size: 12.5px; }
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 13px; z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,.2); max-width: calc(100vw - 32px); }
+
+@media (max-width: 1180px) { .content.split { grid-template-columns: 1fr; } .content.split .list { display: none; } .detail { border-left: 0; } }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .top { padding: 0 16px; gap: 8px; }
+  .top h1 { display: none; }
+  .top select { display: block; }
+  .tabs { display: none; }
+  .hide-m { display: none !important; }
+  .newlabel { display: none; }
+  .list th:first-child, .list td:first-child { padding-left: 16px; }
+  .list th:last-child, .list td:last-child { padding-right: 16px; }
+  .rng { grid-template-columns: 1fr; gap: 4px; }
+  .rng .val { text-align: left; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi:nth-child(3n) { border-right: 1px solid var(--line); }
+  .kpi:nth-child(2n) { border-right: 0; }
+  .kpi:nth-last-child(-n+3) { border-bottom: 1px solid var(--line); }
+  .kpi:nth-last-child(-n+2) { border-bottom: 0; }
+  .d-head, .d-body { padding-left: 16px; padding-right: 16px; }
+  .d-tabs { padding: 0 16px; }
+  .pipe div { font-size: 0; }
+  .cov, .grid2 { grid-template-columns: 1fr; }
+  .ev { grid-template-columns: 62px 1fr; }
+  .ev .s { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="ws"><div class="logo" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 12.5 8 6.5 11 12.5 14 3.5"/></svg></div><div><b>WEMINE</b><small>Cafe robot pilot · MuJoCo</small></div></div>
+    <button class="nav" data-view="orders"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M5 6h6M5 8.5h6M5 11h3.5"/></svg>Orders<span class="count" id="cOrders">0</span></button>
+    <div class="nav-h">Deliverables</div>
+    <button class="nav" data-view="datasets"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>Datasets<span class="count" id="cDatasets">0</span></button>
+    <button class="nav" data-view="qa"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.8 13.5 4v4c0 3-2.4 5.3-5.5 6.2C4.9 13.3 2.5 11 2.5 8V4z"/><path d="m5.5 8 1.8 1.8L10.8 6"/></svg>QA reports<span class="count" id="cQa">0</span></button>
+    <div class="nav-h">Account</div>
+    <button class="nav" data-view="billing"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3.5" width="12.4" height="9" rx="1.5"/><path d="M1.8 6.5h12.4"/></svg>Billing<span class="count" id="cBilling">0</span></button>
+    <div class="side-foot">
+      <div class="live"><i></i>Agents: Brainbase · Cloudflare sandbox</div>
+      <div id="simFoot">Simulator: …</div>
+    </div>
+  </aside>
+
+  <section class="main">
+    <header class="top">
+      <h1 id="viewTitle">Orders</h1>
+      <select id="viewSelect" aria-label="View">
+        <option value="orders">Orders</option><option value="datasets">Datasets</option>
+        <option value="qa">QA reports</option><option value="billing">Billing</option>
+      </select>
+      <div class="tabs" id="filters"></div>
+      <div class="spacer"></div>
+      <span class="demo-pill" id="demoPill" hidden>Demo mode — scripted agents</span>
+      <button class="btn primary" id="newBtn">+<span class="newlabel"> New order</span> <span class="kbd hide-m">N</span></button>
+      <div class="user" id="userChip" hidden><span class="av" id="userAv"></span><span class="nm" id="userName"></span>
+        <a href="/?switch=1">Switch role</a><span class="sep">·</span><a href="/" id="signOut">Sign out</a></div>
+    </header>
+    <div class="content" id="content">
+      <div class="list" id="list"></div>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="m-head"><b id="mTitle">New order</b> · Tell us the robot, the task, the environment, and the data you need (schema &amp; count)</div>
+    <textarea id="mText" aria-label="Order description" placeholder="e.g. Robot: a Franka-like single arm. Task: serve a coffee — pick up the cup of coffee and put it on the tray. Environment: a realistic cafe counter. Data: wrist + front camera 128×128 RGB, joint states and actions at 20 Hz, 200 episodes."></textarea>
+    <div class="m-ex" id="mEx"></div>
+    <div class="m-foot">
+      <label><input type="checkbox" id="mAuto"> Fill defaults without asking me</label>
+      <div class="spacer"></div>
+      <button class="btn" id="mCancel">Cancel</button>
+      <button class="btn primary" id="mSubmit">Create order</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Requester session from the login page (/); ?nologin=1 skips the check for local testing.
+const USER = (() => { try { return JSON.parse(localStorage.getItem("wemine_user") || "null"); } catch (e) { return null; } })();
+if ((!USER || USER.role !== "requester") && !new URLSearchParams(location.search).has("nologin")) location.replace("/" + location.search);
+</script>
+<script src="/static/app.js"></script>
+<script>
+const { h } = Agri;
+const $ = (id) => document.getElementById(id);
+
+const STATE = {
+  running: ["b-blue b-run", "In progress"],
+  needs_reply: ["b-amber", "Needs reply"],
+  needs_approval: ["b-amber", "Approve spec"],
+  needs_play: ["b-amber", "Play demo"],
+  awaiting_payment: ["b-blue", "Awaiting payment"],
+  delivered: ["b-green", "Delivered"],
+  failed: ["b-red", "Failed"],
+};
+const ACTION = ["needs_reply", "needs_approval", "needs_play", "awaiting_payment"];
+const FILTERS = [["all", "All", () => true], ["action", "Action needed", (o) => ACTION.includes(o.state)],
+  ["running", "In progress", (o) => o.state === "running"], ["delivered", "Delivered", (o) => o.state === "delivered"]];
+const VIEWS = { orders: "Orders", datasets: "Datasets", qa: "QA reports", billing: "Billing" };
+const TABS = [["overview", "Overview"], ["conversation", "Conversation"], ["spec", "Spec"], ["plan", "Plan"], ["scene", "Scene"],
+  ["play", "Play"], ["data", "Data"], ["qa", "QA"], ["billing", "Billing"], ["files", "Files"], ["json", "JSON"]];
+const VERDICT = { pass: ["b-green", "Pass"], pass_with_notes: ["b-amber", "Pass with notes"], fail: ["b-red", "Fail"] };
+const FILE_INFO = {
+  "dataset.hdf5": "Episodes: camera RGB, joint states, end-effector pose, actions, task stages",
+  "manifest.json": "Episode and frame counts, sensors, sha256",
+  "qa_report.md": "QA verdict, findings and checks (readable)",
+  "qa_report.json": "QA report plus full computed metrics",
+  "spec.json": "The approved DatasetSpec",
+};
+const MOCK_NOTE = "AI-player episodes come from a mock worker (synthetic trajectories and frames) for this demo. The human episode is recorded in the real MuJoCo scene.";
+
+let config = { demo: false, worker: "", pricing_note: "" };
+let summaries = [];
+let full = null;              // full order JSON for the selected order
+let view = "orders", filter = "all", selected = null, tab = "overview";
+let listSig = "", detailSig = "";
+const drafts = {};
+
+// Composer lives outside the re-rendered DOM so typing survives polling.
+const composerTa = h("textarea", { placeholder: "Answer the agent's questions…", "aria-label": "Your reply" });
+const sendBtn = h("button.btn.primary", {}, "Send reply");
+const composer = h("div.composer", composerTa, h("div.bar", h("span.hide-m", "⌘/Ctrl + Enter to send"), h("div.spacer"), sendBtn));
+composerTa.addEventListener("input", () => { if (selected) drafts[selected] = composerTa.value; });
+composerTa.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) sendBtn.click(); });
+sendBtn.onclick = () => act("answer", composerTa.value.trim());
+
+function badge(state) {
+  const [cls, label] = STATE[state] || ["b-gray", state];
+  return h("span.badge." + cls.split(" ").join("."), h("i"), label);
+}
+const vbadge = (v) => { const [c, l] = VERDICT[v] || ["b-gray", v]; return h("span.badge." + c, h("i"), l); };
+const modeLabel = (o) => o.spec ? (o.spec.mode === "failure" ? "Failure repro" : "Generation") : "—";
+const since = (ts) => h("span", { "data-since": ts }, Agri.elapsed(ts));
+const kpi = (k, v) => h("div.kpi", h("small", k), h("b", { title: String(v) }, v));
+function toast(msg) {
+  const t = h("div.toast", msg); document.body.append(t); setTimeout(() => t.remove(), 3500);
+}
+function currentStage(o) {
+  const s = o.stages.find((x) => x.status === "running" || x.status === "waiting" || x.status === "failed");
+  if (s) return `${s.label}: ${s.error || s.detail || s.status}`;
+  const done = o.stages.filter((x) => x.status === "done");
+  return done.length ? `${done[done.length - 1].label}: ${done[done.length - 1].detail}` : "";
+}
+
+/* ---------------- list views ---------------- */
+
+function renderNav() {
+  const hot = summaries.filter((o) => ACTION.includes(o.state)).length;
+  $("cOrders").replaceChildren(hot ? h("span.hotpill", { title: `${hot} need your action` }, hot) : "", String(summaries.length));
+  $("cDatasets").textContent = summaries.filter((o) => o.state === "delivered").length;
+  $("cQa").textContent = summaries.filter((o) => o.qa_report).length;
+  $("cBilling").textContent = summaries.filter((o) => o.quote).length;
+  document.querySelectorAll(".nav[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
+  $("viewTitle").textContent = VIEWS[view];
+  $("viewSelect").value = view;
+  $("filters").hidden = view !== "orders";
+  $("filters").replaceChildren(...FILTERS.map(([k, label, pred]) =>
+    h("button.tab" + (filter === k ? ".on" : ""), { onclick: () => { filter = k; renderList(); } }, label, h("span.n", summaries.filter(pred).length))));
+}
+
+function setList(...nodes) { $("list").replaceChildren(...nodes.filter(Boolean)); }
+
+function rowAttrs(o, openTab) {
+  return { onclick: () => select(o.id, openTab), class: "row" + (selected === o.id ? " sel" : "") };
+}
+
+function renderList() {
+  renderNav();
+  const list = $("list");
+  if (!summaries.length) {
+    list.replaceChildren(h("div.empty", h("div.box",
+      h("div.ill", { html: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3v3M11 3v3"/></svg>' }),
+      h("h2", "No orders yet"),
+      h("p", "Tell us the robot, the task, the environment and the data you need. The agents turn it into a spec, a MuJoCo plan, a cafe scene, a playable game, episodes, QA and a quote."),
+      h("button.btn.primary", { onclick: openModal }, "Create first order"))));
+    return;
+  }
+  let table;
+  if (view === "orders") {
+    const pred = FILTERS.find((f) => f[0] === filter)[2];
+    const rows = summaries.filter(pred);
+    table = h("table",
+      h("thead", h("tr", h("th", "ID"), h("th", "Request"), h("th.hide-m.wide-only", "Type"), h("th", "Status"), h("th.hide-m", "Current step"), h("th.hide-m.wide-only", "Created"))),
+      h("tbody", rows.map((o) => h("tr", rowAttrs(o),
+        h("td.id", Agri.shortId(o.id)), h("td.req", Agri.title(o.text)),
+        h("td.hide-m.wide-only", h("span.mode", modeLabel(o))), h("td", badge(o.state)),
+        h("td.stage-c.hide-m", { title: currentStage(o) }, currentStage(o)), h("td.sub.hide-m.wide-only", Agri.ago(o.created_at))))));
+    setList(table, rows.length ? null : h("div.none", "No orders match this filter."));
+    return;
+  }
+  if (view === "datasets") {
+    const rows = summaries.filter((o) => o.state === "delivered");
+    table = h("table",
+      h("thead", h("tr", h("th", "ID"), h("th", "Request"), h("th.r", "Episodes"), h("th.hide-m", "Size"), h("th", "Download"))),
+      h("tbody", rows.map((o) => h("tr", rowAttrs(o, "files"),
+        h("td.id", Agri.shortId(o.id)), h("td.req", Agri.title(o.text)),
+        h("td.num", o.manifest ? o.manifest.episodes.toLocaleString() : "—"),
+        h("td.sub.hide-m", o.manifest ? Agri.bytes(o.manifest.size_bytes) : "—"),
+        h("td", { onclick: (e) => e.stopPropagation() }, h("div", { style: "display:flex;gap:6px" },
+          h("a.btn.sm", { href: Agri.fileUrl(o.id, "dataset.hdf5"), download: true }, "HDF5"),
+          h("a.btn.sm.hide-m", { href: Agri.fileUrl(o.id, "qa_report.md"), download: true }, "QA report")))))));
+    setList(table, rows.length ? null : h("div.none", "No delivered datasets yet. Datasets appear here once an order is paid."));
+    return;
+  }
+  if (view === "qa") {
+    const rows = summaries.filter((o) => o.qa_report);
+    table = h("table",
+      h("thead", h("tr", h("th", "ID"), h("th", "Verdict"), h("th", "Headline"), h("th.hide-m", "Episodes"))),
+      h("tbody", rows.map((o) => h("tr", rowAttrs(o, "qa"),
+        h("td.id", Agri.shortId(o.id)), h("td", vbadge(o.qa_report.verdict)),
+        h("td.req", { title: o.qa_report.headline }, o.qa_report.headline),
+        h("td.num.hide-m", o.manifest ? o.manifest.episodes.toLocaleString() : "—")))));
+    setList(table, rows.length ? null : h("div.none", "No QA reports yet."));
+    return;
+  }
+  const rows = summaries.filter((o) => o.quote);
+  table = h("table",
+    h("thead", h("tr", h("th", "ID"), h("th", "Request"), h("th.r", "Total"), h("th", "Status"), h("th.hide-m", "Reference"))),
+    h("tbody", rows.map((o) => h("tr", rowAttrs(o, "billing"),
+      h("td.id", Agri.shortId(o.id)), h("td.req", Agri.title(o.text)),
+      h("td.num", { style: "font-weight:600" }, Agri.usd(o.quote.total_usd)),
+      h("td", o.payment ? h("span.badge.b-green", h("i"), o.payment.mode === "stripe_test" ? "Paid (Stripe test)" : "Paid (test)") : o.state === "awaiting_payment" ? h("span.badge.b-blue", h("i"), "Awaiting payment") : badge(o.state)),
+      h("td.id.hide-m", o.payment ? o.payment.reference : "—")))));
+  setList(walletCard(), h("h3", { style: "margin:18px 20px 8px;font-size:13px" }, "Order payments"), table,
+    rows.length ? null : h("div.none", "No quotes yet. The Payment Agent quotes each order after QA."), h("p.caption", { style: "padding:0 20px" }, config.pricing_note));
+  if (!wallet || Date.now() - walletAt > 5000) loadWallet();
+}
+
+/* ---------------- wallet (credits, Stripe top-up) ---------------- */
+
+let wallet = null, walletAt = 0;
+const PACKS = [100, 500, 1000];
+async function loadWallet() {
+  walletAt = Date.now();
+  try { wallet = await Agri.wallet(); if (view === "billing") renderList(); } catch (e) { /* retry on next render */ }
+}
+async function topUp(credits, btn) {
+  btn.disabled = true;
+  try {
+    if (config.stripe) { const { url } = await Agri.walletCheckout(credits); location.href = url; return; }
+    await Agri.walletTestTopup(credits); toast(`Added ${credits.toLocaleString()} test credits.`); await loadWallet();
+  } catch (e) { toast(e.message); btn.disabled = false; }
+}
+const LEDGER_LABEL = { topup: "Top-up", hold: "Held for order", release: "Released", capture: "Episode charged", refund: "Refund", token_cost: "AI tokens" };
+function walletCard() {
+  if (!wallet) return h("div.wallet", h("span.caption", "Loading wallet…"));
+  const me = `wallet:${wallet.customer_id}`;
+  const rows = (wallet.entries || []).filter((e) => e.deltas && me in e.deltas).slice(0, 6);
+  return h("div.wallet",
+    h("div.wallet-top",
+      h("div", h("small", { style: "color:var(--muted);font-size:12px" }, "Available credits"),
+        h("div.wallet-bal", Math.round(wallet.available).toLocaleString(), h("small", `≈ ${Agri.usd(wallet.available * (wallet.credit_usd || 1))}`))),
+      h("div", { style: "text-align:right" }, h("small", { style: "color:var(--muted);font-size:12px" }, "Held for active orders"),
+        h("div", { style: "font-weight:600;font-size:15px" }, `${Math.round(wallet.held).toLocaleString()} credits`))),
+    h("div.packs", PACKS.map((n) => h("button.btn" + (n === 1000 ? ".primary" : ""), { onclick: (e) => topUp(n, e.currentTarget) },
+      `+${n.toLocaleString()} credits · ${Agri.usd(n * (wallet.credit_usd || 1))}`))),
+    h("p.caption", { style: "margin:8px 0 0" }, config.stripe
+      ? "Top-ups go through Stripe Checkout in test mode. Use card 4242 4242 4242 4242, any future date and CVC. No real charge."
+      : "Test top-up: no card, no real charge. Set STRIPE_SECRET_KEY (sk_test_…) in .env to top up through Stripe."),
+    rows.length ? h("table.ledger", h("tbody", rows.map((e) => h("tr",
+      h("td", LEDGER_LABEL[e.kind] || e.kind), h("td", { style: "color:var(--muted)" }, e.at.replace("T", " ")),
+      h("td.r", { style: `font-weight:600;color:${e.deltas[me] > 0 ? "var(--green)" : "var(--ink-2)"}` },
+        `${e.deltas[me] > 0 ? "+" : ""}${Math.round(e.deltas[me]).toLocaleString()}`))))) : null);
+}
+
+/* ---------------- detail ---------------- */
+
+const DEFAULT_TAB = { needs_reply: "conversation", needs_approval: "spec", needs_play: "play", awaiting_payment: "billing" };
+
+function select(id, openTab) {
+  if (selected !== id) { selected = id; full = null; detailSig = ""; composerTa.value = drafts[id] || ""; }
+  const s = summaries.find((o) => o.id === id);
+  tab = openTab || DEFAULT_TAB[s && s.state] || "overview";
+  renderList(); renderDetail(true); loadDetail();
+}
+
+async function loadDetail() {
+  if (!selected) return;
+  const id = selected;
+  try {
+    const o = await Agri.get(id);
+    if (id !== selected) return;
+    const sig = JSON.stringify(o);
+    if (sig === detailSig) return;
+    const wasState = full && full.state;
+    full = o; detailSig = sig;
+    if (wasState && wasState !== o.state && DEFAULT_TAB[o.state]) tab = DEFAULT_TAB[o.state];
+    renderDetail(true);
+    const listed = summaries.find((x) => x.id === id);
+    if (listed && listed.state !== o.state) refreshList();
+  } catch (e) { toast(e.message); }
+}
+
+function closeDetail() { selected = null; full = null; detailSig = ""; renderList(); renderDetail(true); }
+
+function pipeline(o) {
+  return h("div.pipe", o.stages.map((s) => h("div." + s.status, { title: `${s.owner}: ${s.status}${s.detail ? " · " + s.detail : ""}` }, s.label)));
+}
+
+function actionBar(o) {
+  if (o.state === "needs_reply") return h("div.actbar.warn", h("span.msg-t", "The Customer Agent asked a few questions before it drafts the spec."),
+    tab !== "conversation" ? h("button.btn.sm", { onclick: () => setTab("conversation") }, "Reply to agent") : null);
+  if (o.state === "needs_approval") return h("div.actbar.warn", h("span.msg-t", "Review the spec. Approving holds credits and hands the order to the Orchestrator Agent."),
+    tab !== "spec" ? h("button.btn.sm", { onclick: () => setTab("spec") }, "Review spec") : null,
+    approveBtn(o));
+  if (o.state === "needs_play") return h("div.actbar.warn", h("span.msg-t", "A human player demonstrates the task in the browser game. Submit an episode from the player view, then continue."),
+    tab !== "play" ? h("button.btn.sm", { onclick: () => setTab("play") }, "Open play") : null,
+    h("button.btn.go.sm", { onclick: (e) => { e.target.disabled = true; act("continue"); } }, "Continue to AI data collection"));
+  if (o.state === "awaiting_payment") return h("div.actbar.info", h("span.msg-t", "QA is done and the quote is ready. Paying unlocks the files."),
+    tab !== "billing" ? h("button.btn.sm", { onclick: () => setTab("billing") }, "View quote") : null,
+    h("button.btn.primary.sm", { onclick: (e) => { e.target.disabled = true; act("pay"); } }, `Pay ${Agri.usd(o.quote.total_usd)} (test mode)`));
+  if (o.state === "delivered") return h("div.actbar.ok", h("span.msg-t", `Delivered · ${o.manifest ? o.manifest.episodes.toLocaleString() + " episodes" : ""}`),
+    h("a.btn.sm", { href: Agri.fileUrl(o.id, "dataset.hdf5"), download: true }, "Dataset (HDF5)"),
+    h("a.btn.sm", { href: Agri.fileUrl(o.id, "qa_report.md"), download: true }, "QA report"));
+  if (o.state === "failed") {
+    const s = o.stages.find((x) => x.status === "failed");
+    return h("div.actbar.err", h("span.msg-t", h("b", `${s ? s.label : "Order"} failed. `), s ? s.error : ""),
+      h("button.btn.sm", { onclick: (e) => { e.target.disabled = true; act("retry"); } }, `Retry from ${s ? s.label : "start"}`));
+  }
+  const s = o.stages.find((x) => x.status === "running");
+  return h("div.actbar.info", h("span.spin"), h("span.msg-t", s ? `${s.owner}: ${s.detail || "working"}` : "Working…"),
+    s && s.started_at ? h("span", { style: "font-variant-numeric:tabular-nums" }, since(s.started_at)) : null);
+}
+
+function setTab(k) { tab = k; renderDetail(false); }
+
+const credits = (v) => `${(+v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits`;
+function approveBtn(o) {
+  const c = o.credits || {};
+  return h("button.btn.go.sm", { onclick: (e) => { e.target.disabled = true; act("approve"); } },
+    c.estimate != null ? `Approve spec & hold ${credits(c.estimate)}` : "Approve spec & start production");
+}
+
+function renderDetail(keepScroll) {
+  const content = $("content");
+  const old = content.querySelector(".detail");
+  if (!selected) { content.classList.remove("split"); if (old) old.remove(); return; }
+  content.classList.add("split");
+  const s = summaries.find((x) => x.id === selected);
+  const o = full;
+  const scroll = keepScroll && old ? old.querySelector(".d-body").scrollTop : 0;
+  const hadFocus = document.activeElement === composerTa;
+  const body = h("div.d-body");
+  if (!o) body.append(h("div.banner.muted", h("span.spin"), "Loading order…"));
+  else ({ overview, conversation, spec: specTab, plan: planTab, scene, play: playTab, data: dataTab, qa: qaTab, billing, files, json })[tab](o, body);
+  const attention = { conversation: o && o.state === "needs_reply", spec: o && o.state === "needs_approval", play: o && o.state === "needs_play", billing: o && o.state === "awaiting_payment" };
+  const panel = h("aside.detail",
+    h("div.d-head",
+      h("div.d-meta", Agri.shortId(selected), s || o ? badge((o || s).state) : null,
+        h("button.x", { onclick: closeDetail, "aria-label": "Close order" }, "✕")),
+      h("div.d-title", Agri.title((o || s || {}).text)),
+      o ? pipeline(o) : null,
+      o ? actionBar(o) : null),
+    h("div.d-tabs", TABS.map(([k, label]) => h("button.d-tab" + (tab === k ? ".on" : ""), { onclick: () => setTab(k) },
+      label, attention[k] && tab !== k ? h("span.dot") : null))),
+    body);
+  old ? old.replaceWith(panel) : content.append(panel);
+  body.scrollTop = scroll;
+  if (hadFocus && composer.isConnected) composerTa.focus();
+}
+
+function overview(o, el) {
+  const says = [];
+  if (o.spec_summary) says.push(["Customer Agent", o.spec_summary]);
+  if (o.orchestrator_summary) says.push(["Orchestrator Agent", o.orchestrator_summary]);
+  if (o.plan_summary) says.push(["Environment Agent", o.plan_summary]);
+  if (o.qa_report) says.push(["QA Agent", o.qa_report.headline]);
+  if (o.quote_summary) says.push(["Payment Agent", o.quote_summary]);
+  if (says.length) el.append(h("div.sec", h("h3", "What the agents said"), h("div.says",
+    says.map(([who, text]) => h("div.say", h("small", h("i", who[0]), who), h("div", text))))));
+  el.append(h("div.sec", h("h3", "Pipeline"), h("div.tl", o.stages.map((s) => {
+    const icon = { done: "✓", failed: "!", waiting: "…" }[s.status] || "";
+    const dur = s.started_at ? (s.status === "running" ? since(s.started_at) : s.finished_at ? Agri.elapsed(s.started_at, s.finished_at) : "") : "";
+    return h("div.st", h("div.ico." + s.status, icon),
+      h("div", h("div.nm", s.label, h("span", s.owner)),
+        s.detail ? h("div.dt", s.detail) : s.status === "pending" ? h("div.dt", { style: "color:var(--muted)" }, "Not started") : null,
+        s.error ? h("div.er", s.error) : null,
+        s.thread_id ? h("div.th", { title: "Brainbase thread " + s.thread_id }, "Brainbase thread " + s.thread_id.slice(0, 8)) : null),
+      h("div.dur", dur));
+  }))));
+  if (o.events.length) el.append(h("div.sec", h("h3", "Activity"), h("div.feed",
+    [...o.events].reverse().map((e) => h("div.ev", h("span.t", Agri.clock(e.t)), h("span.s", (o.stages.find((s) => s.key === e.stage) || {}).label || e.stage), h("span.x", e.text))))));
+}
+
+function conversation(o, el) {
+  const msgs = h("div.msgs", (o.transcript || []).map((m) => {
+    const agent = m.role === "agent";
+    return h("div.msg", h("div.av." + (agent ? "a" : "c"), agent ? "CA" : "You"),
+      h("div", { style: "min-width:0" }, h("div.who", agent ? "Customer Agent" : "You"),
+        m.questions ? h("div.txt", h("ol", m.questions.map((q) => h("li", q)))) : h("div.txt", m.text)));
+  }));
+  el.append(msgs);
+  const spec = o.stages.find((s) => s.key === "spec");
+  if (spec.status === "running") msgs.append(h("div.msg", h("div.av.a", "CA"), h("div", h("div.who", "Customer Agent", h("span", "working · ", since(spec.started_at))), h("div.txt", { style: "color:var(--muted)" }, "Reading the order in a Cloudflare sandbox. Usually 30–90 s."))));
+  if (o.state === "needs_reply") {
+    sendBtn.disabled = false;
+    el.append(composer);
+    if (document.activeElement !== composerTa) setTimeout(() => composerTa.focus({ preventScroll: true }), 0);
+  } else if (o.spec) {
+    el.append(h("p.caption", { style: "margin-top:16px" }, "The spec is final. Start a new order to change it."));
+  }
+}
+
+function waitBanner(o, key, idle) {
+  const st = o.stages.find((x) => x.key === key);
+  return st && st.status === "running"
+    ? h("div.banner.info", h("span.spin"), h("div", `${st.owner}: ${st.detail || "working"} · `, since(st.started_at)))
+    : h("div.banner.muted", idle);
+}
+const cam = (c) => `${Agri.CAMERA_LABELS[c.name] || c.name} · ${c.width}×${c.height} · ${c.fps} fps`;
+const VARIETY = { single: "One", few: "A few", many: "Many" };
+
+function specTab(o, el) {
+  const s = o.spec;
+  if (!s) { el.append(h("div.banner.muted", "The Customer Agent is still drafting the spec.")); return; }
+  if (o.spec_summary) el.append(h("div.banner.ok", h("div", o.spec_summary)));
+  const e = s.environment, d = s.data;
+  el.append(h("div.kpis",
+    kpi("Robot (sim)", "Franka Panda · mobile (PandaOmron)"), kpi("Your robot", s.robot.customer_robot || "Not stated"), kpi("Type", s.mode === "failure" ? "Failure repro" : "Generation"),
+    kpi("Task", `Serve a coffee (${s.task_steps.length} steps)`), kpi("Environment", "Cafe counter · MuJoCo"), kpi("Episodes", s.episode_count.toLocaleString())));
+  el.append(h("div.sec", h("h3", "1 · Robot"), h("div.kv", `Simulated as a mobile Franka Panda (${s.robot.sim_model}), a proxy for ${s.robot.customer_robot || "your robot"}.`)));
+  el.append(h("div.sec", h("h3", "2 · Task"), h("ol.steps", s.task_steps.map((t) => h("li", t))),
+    h("p.caption", `Success: ${Agri.successText(s.success_rule)}.`)));
+  el.append(h("div.sec", h("h3", "3 · Environment"), h("div.grid2",
+    [["Setting", e.description], ["Scene template", e.scene_template], ["Counter layouts", VARIETY[e.layout_variety] || e.layout_variety], ["Visual styles", VARIETY[e.style_variety] || e.style_variety]]
+      .map(([k, v]) => h("div", h("small", k), h("b", v))))));
+  el.append(h("div.sec", h("h3", "4 · Data schema & count"),
+    h("table.tbl", h("tbody",
+      h("tr", h("td", { style: "width:130px;color:var(--muted)" }, "Cameras"), h("td", h("div.chips", d.cameras.map((c) => h("span.chip", cam(c)))))),
+      h("tr", h("td", { style: "color:var(--muted)" }, "Streams"), h("td", h("div.chips", d.sensors.map((x) => h("span.chip", Agri.SENSOR_LABELS[x] || x))))),
+      h("tr", h("td", { style: "color:var(--muted)" }, "Control rate"), h("td", `${d.control_hz} Hz`)),
+      h("tr", h("td", { style: "color:var(--muted)" }, "Format"), h("td", d.format.toUpperCase())),
+      h("tr", h("td", { style: "color:var(--muted)" }, "Episodes"), h("td", `${s.episode_count.toLocaleString()} QA-passed episodes`))))));
+  if (s.reference_failure) el.append(h("div.sec", h("h3", "Reported failure"), h("div.kv", s.reference_failure)));
+  if (s.assumptions.length) el.append(h("div.sec", h("h3", "Agent assumptions"), h("ul.lst", s.assumptions.map((a) => h("li", a)))));
+  if (s.out_of_scope.length) el.append(h("div.sec", h("h3", "Not in this pilot"), h("div.banner.warn", h("ul.lst", { style: "color:inherit" }, s.out_of_scope.map((a) => h("li", a))))));
+  const c = o.credits || {};
+  if (o.state === "needs_approval" || c.held) el.append(h("div.sec", h("h3", "Credits"),
+    h("div.kpis", kpi("Estimate", credits(c.estimate)), kpi("Held for this order", credits(c.held)), kpi("Wallet balance", credits(c.balance))),
+    o.state === "needs_approval" ? approveBtn(o) : null));
+}
+
+function planTab(o, el) {
+  const p = o.orchestrator_plan;
+  if (!p) { el.append(waitBanner(o, "plan", "The Orchestrator Agent writes the MuJoCo production plan after you approve the spec.")); return; }
+  if (o.orchestrator_summary) el.append(h("div.banner.ok", h("div", o.orchestrator_summary)));
+  const ds = p.data_sourcing;
+  el.append(h("div.kpis", kpi("Simulator", `${p.simulator} · ${p.framework}`), kpi("Human demos", ds.human_demos.toLocaleString()), kpi("AI episodes", ds.ai_episodes.toLocaleString())));
+  el.append(h("div.sec", h("h3", "Production plan"), h("div.flow", p.steps.map((x, i) => h("div.fs",
+    h("div.ico.done", String(i + 1)),
+    h("div", h("div", h("b", x.action), h("span.who", `${x.agent} · ${x.stage}`)), h("small", `→ ${x.output}`)))))));
+  el.append(h("div.sec", h("h3", "Scene build"), h("ol.steps", p.scene_build.map((x) => h("li", x)))));
+  el.append(h("div.sec", h("h3", "Task stages & success checks"), h("table.tbl",
+    h("thead", h("tr", h("th", "#"), h("th", "Stage"), h("th", "Done when"))),
+    h("tbody", p.task_stages.map((t, i) => h("tr", h("td.m", String(i + 1)), h("td", { style: "font-weight:500" }, t.name), h("td.kv", t.success_check)))))));
+  el.append(h("div.sec", h("h3", "Data sourcing"), h("div.kv", ds.method)));
+  el.append(h("div.sec", h("h3", "Data mapping"), h("ul.lst", p.data_mapping.map((x) => h("li", x)))));
+  el.append(h("div.sec", h("h3", "QA criteria"), h("ul.lst", p.qa_criteria.map((x) => h("li", x)))));
+  if (p.risks.length) el.append(h("div.sec", h("h3", "Risks"), h("div.banner.warn", h("ul.lst", { style: "color:inherit" }, p.risks.map((x) => h("li", x))))));
+  if (p.rationale) el.append(h("div.sec", h("h3", "Rationale"), h("div.kv", p.rationale)));
+}
+
+function scene(o, el) {
+  const p = o.plan;
+  if (!p) { el.append(waitBanner(o, "environment", "The Environment Agent builds the cafe scene after the production plan is ready.")); return; }
+  if (o.plan_summary) el.append(h("div.banner.ok", h("div", o.plan_summary)));
+  if (o.has_scene_preview) el.append(h("div.sec", h("h3", "Scene render · MuJoCo"),
+    h("img.preview.real", { src: Agri.fileUrl(o.id, "scene.png") + "?v=" + (o.plan.base_seed || 0), alt: "MuJoCo render of the cafe counter scene" }),
+    h("p.caption", `${p.task} · ${p.robot} · layout ${p.layout_ids[0]}, style ${p.style_ids[0]}. A cup of coffee on the counter, a tray next to it, and a coffee machine behind.`)));
+  else {
+    const env = o.stages.find((x) => x.key === "environment");
+    if (env.status === "running") el.append(h("div.banner.info", h("span.spin"), h("div", "Rendering the scene in MuJoCo · ", since(env.started_at))));
+  }
+  el.append(h("div.sec", h("h3", "Scene settings"), h("div.grid2",
+    [["Simulator", p.simulator], ["Scene", p.scene_template], ["Task", p.task], ["Robot", p.robot],
+     ["Counter layouts", p.layout_ids.join(", ")], ["Visual styles", p.style_ids.join(", ")],
+     ["Control", `${p.control_hz} Hz · max ${p.max_steps.toLocaleString()} steps`], ["Base seed", String(p.base_seed)],
+     ["Object models", p.object_instance_randomization ? "Randomized per episode" : "Fixed"], ["Placement jitter", `${(p.placement_jitter_m * 100).toFixed(1)} cm`]]
+      .map(([k, v]) => h("div", h("small", k), h("b", v))))));
+  el.append(h("div.sec", h("h3", "Cameras"), h("div.chips", p.cameras.map((c) => h("span.chip", cam(c))))));
+  if (p.focus.length) el.append(h("div.sec", h("h3", "Focus"), h("ul.lst", p.focus.map((f) => h("li", f)))));
+  if (p.rationale) el.append(h("div.sec", h("h3", "Rationale"), h("div.kv", p.rationale)));
+}
+
+function playTab(o, el) {
+  const pl = o.play || {};
+  const st = o.stages.find((x) => x.key === "play");
+  const open = o.state === "needs_play" || (st && st.status === "done");
+  if (!open) { el.append(waitBanner(o, "play", "The browser game opens once the scene is built.")); return; }
+  if (o.state === "needs_play") el.append(h("div.banner.warn", h("div",
+    h("b", "Human demo. "), "The player controls the robot in the browser game; you watch live here. Submit an episode from the player view, then continue to AI data collection.")));
+  const eps = pl.human_episodes || [];
+  el.append(h("div.sec", h("h3", "Live view"),
+    h("div.frame16", pl.viewer_url && o.state === "needs_play"
+      ? h("iframe", { src: pl.viewer_url, title: "Live view of the player's session", allow: "fullscreen" })
+      : h("div.ph", pl.viewer_url ? "Play is closed for this order." : "Game server not connected. Set AGRIPHILO_GAME_SERVER_URL and restart the console.")),
+    pl.player_url && o.state === "needs_play" ? h("div", { style: "display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap" },
+      h("a.btn.primary.bigbtn", { href: pl.player_url, target: "_blank", rel: "noopener" }, "Open player view ↗"),
+      h("span.caption", { style: "margin:0" }, "Opens the game with keyboard control in a new tab (the player's screen).")) : null,
+    h("p.caption", "Published to the WEMINE marketplace — players can pick this game at ", h("a", { href: "/player", target: "_blank", rel: "noopener" }, "/player"), ".")));
+  if (o.spec) el.append(h("div.sec", h("h3", "Task"), h("ol.steps", o.spec.task_steps.map((t) => h("li", t)))));
+  el.append(h("div.sec", h("h3", `Human episodes · ${eps.length}`), eps.length
+    ? h("div.scroll-x", h("table.tbl",
+      h("thead", h("tr", h("th", "File"), h("th", "Player"), h("th.r", "Steps"), h("th.r", "Stages"), h("th", "Task"), h("th", "QA"), h("th.r", "Replay err"))),
+      h("tbody", eps.map((e) => h("tr", h("td.m", e.file.split("/").pop()), h("td", e.player_id), h("td.r", e.steps.toLocaleString()),
+        h("td.r", `${e.stages_completed}/${(o.spec?.task_steps || []).length || 2}`), h("td", e.success ? h("span.badge.b-green", h("i"), "Success") : h("span.badge.b-gray", h("i"), "Incomplete")),
+        h("td", e.qa_passed == null ? h("span.kv", "checking…") : e.qa_passed ? h("span.badge.b-green", h("i"), "Pass") : h("span.badge.b-red", { title: e.qa_reasons.join("; ") }, h("i"), "Fail"),
+          e.qa_reasons.length ? h("div.caption", e.qa_reasons.join("; ")) : null),
+        h("td.r", e.replay_max_qpos_err != null ? e.replay_max_qpos_err.toExponential(1) : "—"))))))
+    : h("div.kv", "No episode submitted yet.")));
+  if (pl.has_human_preview) el.append(h("div.sec", h("h3", "Human episode frames"),
+    h("img.preview.real", { src: Agri.fileUrl(o.id, "human_preview.png") + "?n=" + eps.length, alt: "Frames from the human episode" }),
+    h("p.caption", "Frames sampled over the latest human episode (recorded cameras).")));
+}
+
+function dataTab(o, el) {
+  const sim = o.stages.find((x) => x.key === "simulation");
+  const pl = o.play || {};
+  if (sim.status === "running" && o.progress && o.progress.total) {
+    const pct = Math.round((o.progress.done / o.progress.total) * 100);
+    el.append(h("div.sec", h("h3", "AI players collecting"), h("div.prog", h("div", { style: `width:${pct}%` })),
+      h("div.kv", `${o.progress.done.toLocaleString()} of ${o.progress.total.toLocaleString()} episodes · ${pct}%`)));
+  }
+  const m = o.manifest;
+  if (!m && !pl.has_human_preview && !(o.job && o.job.episodes.length)) {
+    el.append(waitBanner(o, "simulation", "Data appears once the human demo is in and the AI players start collecting."));
+    return;
+  }
+  if (m) el.append(h("div.kpis",
+    kpi("Episodes", m.episodes.toLocaleString()), kpi("Frames", m.frames.toLocaleString()), kpi("Size", Agri.bytes(m.size_bytes)),
+    kpi("Human demos", String((pl.human_episodes || []).length)), kpi("Source", m.worker), kpi("Scene", m.scene_template)));
+  if (pl.has_human_preview) el.append(h("div.sec", h("h3", "Human demo · real MuJoCo recording"),
+    h("img.preview.real", { src: Agri.fileUrl(o.id, "human_preview.png") + "?n=" + (pl.human_episodes || []).length, alt: "Frames from the human episode" })));
+  if (o.has_preview) el.append(h("div.sec", h("h3", "AI player episodes"),
+    h("img.preview", { src: Agri.fileUrl(o.id, "preview.png"), alt: "First (top) and last (bottom) frame of six AI episodes" }),
+    h("p.caption", "Top row: first frame. Bottom row: last frame. Six episodes spread across the dataset.")));
+  if (o.spec) {
+    const d = o.spec.data, got = new Set(m ? m.sensors.filter((x) => !m.missing_sensors.includes(x)) : []);
+    el.append(h("div.sec", h("h3", "Requested schema vs recorded"), h("table.tbl",
+      h("thead", h("tr", h("th", "Field"), h("th", "Requested"), h("th", "Recorded"))),
+      h("tbody",
+        d.cameras.map((c) => h("tr", h("td", Agri.CAMERA_LABELS[c.name] || c.name), h("td.kv", `${c.width}×${c.height} · ${c.fps} fps`),
+          h("td", m ? (got.has("rgb") ? "✓" : "missing") : "—"))),
+        d.sensors.map((x) => h("tr", h("td", Agri.SENSOR_LABELS[x] || x), h("td.kv", `${d.control_hz} Hz`),
+          h("td", m ? (got.has(x) ? "✓" : h("span", { style: "color:var(--red)" }, "missing")) : "—")))))));
+  }
+  if (o.job && o.job.episodes.length) {
+    const eps = o.job.episodes, show = eps.slice(0, 20);
+    el.append(h("div.sec", h("h3", `Episode parameters · ${eps.length.toLocaleString()} episodes`), h("div.scroll-x", h("table.tbl",
+      h("thead", h("tr", h("th", "Episode"), h("th", "Player"), h("th.r", "Seed"), h("th.r", "Layout"), h("th.r", "Style"), h("th.r", "Jitter"))),
+      h("tbody", show.map((e) => h("tr", h("td.m", e.episode_id), h("td", e.player === "human" ? "Human" : "AI"), h("td.r", String(e.seed)),
+        h("td.r", String(e.layout_id)), h("td.r", String(e.style_id)), h("td.r", `${(e.placement_jitter_m * 100).toFixed(1)} cm`)))))),
+      eps.length > show.length ? h("p.caption", `+${(eps.length - show.length).toLocaleString()} more episodes (full list in the JSON tab)`) : null));
+  }
+  if (m) el.append(h("p.caption", { style: "overflow-wrap:anywhere" }, `${m.worker} ${m.simulator_version} · sha256 ${m.sha256.slice(0, 16)}…`));
+  if (o.worker && o.worker.startsWith("mock")) el.append(h("p.caption", MOCK_NOTE));
+}
+
+function qaTab(o, el) {
+  const m = o.qa_metrics, r = o.qa_report;
+  const st = o.stages.find((s) => s.key === "qa");
+  if (!m && !r) {
+    el.append(st.status === "running"
+      ? h("div.banner.info", h("span.spin"), h("div", st.detail || "Running QA", " · ", since(st.started_at)))
+      : h("div.banner.muted", "QA runs after the AI players finish collecting."));
+    return;
+  }
+  if (r) {
+    const cls = { pass: "ok", pass_with_notes: "warn", fail: "err" }[r.verdict] || "muted";
+    el.append(h("div.banner." + cls, h("div", h("div", { style: "display:flex;gap:8px;align-items:center;margin-bottom:4px" }, vbadge(r.verdict), h("b", "QA Agent verdict")), r.headline)));
+    el.append(h("div.sec", h("h3", "Findings"), h("ul.lst", r.findings.map((f) => h("li", f)))));
+    if (r.recommended_fixes.length) el.append(h("div.sec", h("h3", "Recommended fixes"), h("ul.lst", r.recommended_fixes.map((f) => h("li", f)))));
+    if (r.rerun_needed) el.append(h("div.banner.warn", h("div", h("b", "Rerun requested: "), r.rerun_focus || "")));
+  } else if (st.status === "running") {
+    el.append(h("div.banner.info", h("span.spin"), h("div", st.detail || "QA Agent is writing the report")));
+  }
+  if (!m) return;
+  el.append(h("div.kpis",
+    kpi("Valid episodes", `${m.episodes_valid.toLocaleString()} / ${m.episodes_total.toLocaleString()}`),
+    kpi("Success rate", `${Math.round(m.success_rate * 100)}%`),
+    kpi("Reproducible", `${m.repro_matched} / ${m.repro_checked}`)));
+  const cats = ["structure", "task", "diversity", "reproducibility"];
+  const icon = { pass: "✓", warn: "!", fail: "✕" };
+  el.append(h("div.sec", h("h3", "Checks"), h("table.tbl", h("tbody", cats.map((c) => {
+    const rows = m.checks.filter((x) => x.category === c);
+    if (!rows.length) return null;
+    return [h("tr", h("td.cat", { colspan: 3 }, c)), rows.map((x) => h("tr",
+      h("td", { style: "width:26px" }, h("span.st-i." + x.status, { title: x.status }, icon[x.status])),
+      h("td", { style: "font-weight:500" }, x.name), h("td.kv", x.detail)))];
+  })))));
+  el.append(h("div.sec", h("h3", "Coverage"), h("div.cov", Object.entries(m.coverage).map(([axis, bins]) => {
+    const fmt = (Agri.AXIS_FMT[axis] || { label: axis, f: (v) => v }).f;
+    const label = (Agri.AXIS_FMT[axis] || { label: axis }).label;
+    const max = Math.max(1, ...bins.map((b) => b.count));
+    return h("div.cov-c", h("b", label),
+      h("div.bars", bins.map((b) => h("div" + (b.count ? "" : ".zero"), {
+        style: `height:${b.count ? Math.max(6, (b.count / max) * 100) : 100}%`,
+        title: `${b.lo === b.hi ? fmt(b.lo) : fmt(b.lo) + " – " + fmt(b.hi)}: ${b.count} episodes` + (b.success_rate != null ? `, ${Math.round(b.success_rate * 100)}% success` : ""),
+      }))),
+      h("div.bars-l", bins.map((b) => h("span", b.count))),
+      h("div.bars-l", bins.map((b) => h("span", b.success_rate != null ? `${Math.round(b.success_rate * 100)}%` : "—"))),
+      h("div.bars-x", h("span", fmt(bins[0].lo)), h("span", "count · success"), h("span", fmt(bins[bins.length - 1].hi))));
+  }))));
+  const reasons = Object.entries(m.failure_reasons);
+  if (reasons.length) el.append(h("div.sec", h("h3", "Why unsuccessful episodes failed"), h("div.chips",
+    reasons.sort((a, b) => b[1] - a[1]).map(([k, v]) => h("span.chip", `${k.replace(/_/g, " ")} · ${v}`)))));
+  const invalid = (m.episodes || []).filter((e) => !e.valid);
+  el.append(h("div.sec", h("h3", `Excluded episodes · ${invalid.length}`), invalid.length
+    ? h("table.tbl", h("tbody", invalid.map((e) => h("tr", h("td.m", e.episode_id), h("td.kv", e.reasons.join("; "))))))
+    : h("div.kv", "None. Every episode passed the structural checks.")));
+}
+
+function billing(o, el) {
+  const q = o.quote;
+  const st = o.stages.find((s) => s.key === "quote");
+  if (!q) {
+    el.append(st.status === "running"
+      ? h("div.banner.info", h("span.spin"), h("div", "Payment Agent is preparing the quote · ", since(st.started_at)))
+      : h("div.banner.muted", "The Payment Agent quotes the order after QA."));
+    return;
+  }
+  if (o.quote_summary) el.append(h("div.banner.ok", h("div", o.quote_summary)));
+  const items = q.line_items.filter((l) => l.amount_usd >= 0), disc = q.line_items.filter((l) => l.amount_usd < 0);
+  const row = (l) => h("tr", h("td", h("div", l.description), h("div.m", { style: "font-family:var(--mono);font-size:11px;color:var(--muted)" }, l.sku)),
+    h("td.r", `${l.quantity.toLocaleString()} ${l.unit}`), h("td.r", Agri.usd(l.unit_price_usd)), h("td.r", Agri.usd(l.amount_usd)));
+  el.append(h("div.sec", h("h3", "Quote"), h("div.scroll-x", h("table.tbl",
+    h("thead", h("tr", h("th", "Item"), h("th.r", "Qty"), h("th.r", "Unit price"), h("th.r", "Amount"))),
+    h("tbody", items.map(row),
+      h("tr.subt", h("td", { colspan: 3 }, "Subtotal"), h("td.r", Agri.usd(q.subtotal_usd))),
+      disc.map(row),
+      h("tr.tot", h("td", { colspan: 3 }, `Total (${q.currency})`), h("td.r", Agri.usd(q.total_usd)))))),
+    h("p.caption", `Valid for ${q.valid_days} days. ${config.pricing_note}`)));
+  if (q.notes.length) el.append(h("div.sec", h("h3", "Notes"), h("ul.lst", q.notes.map((n) => h("li", n)))));
+  if (o.payment) {
+    const viaStripe = o.payment.mode === "stripe_test";
+    el.append(h("div.banner.ok", h("div", h("b", `Paid ${Agri.usd(o.payment.amount_usd)} · ${viaStripe ? "Stripe test mode" : "test mode"}`), h("div", `Reference ${o.payment.reference} · ${new Date(o.payment.paid_at * 1000).toLocaleString()}`),
+      h("div", viaStripe ? "Paid through Stripe Checkout with a test card. No real charge was made." : "No real charge was made."))));
+  } else if (o.state === "awaiting_payment" && config.stripe) {
+    el.append(h("div", { style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" },
+      h("button.btn.primary", { onclick: (e) => { e.target.disabled = true; act("checkout"); } }, `Pay ${Agri.usd(q.total_usd)} with Stripe`),
+      h("span.caption", { style: "margin:0" }, "Stripe Checkout in test mode. Use card 4242 4242 4242 4242, any future date and CVC. No real charge.")));
+  } else if (o.state === "awaiting_payment") {
+    el.append(h("div", { style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" },
+      h("button.btn.primary", { onclick: (e) => { e.target.disabled = true; act("pay"); } }, `Pay ${Agri.usd(q.total_usd)} (test mode)`),
+      h("span.caption", { style: "margin:0" }, "Test checkout: no card, no real charge. Set STRIPE_SECRET_KEY (sk_test_…) in .env to pay through Stripe.")));
+  }
+}
+
+function files(o, el) {
+  if (!o.payment) {
+    el.append(h("div.lock", h("b", "Files unlock after payment"),
+      o.state === "awaiting_payment" ? h("div", "Pay the quote in the Billing tab (test mode) to download the dataset and QA report.")
+        : h("div", "The dataset, manifest, QA report and spec become available once QA and the quote are done and the order is paid.")));
+  } else {
+    el.append(h("div.files", o.files.map((name) => h("div.file",
+      h("div.fi", name.split(".").pop().toUpperCase().slice(0, 4)),
+      h("div.fn", h("b", name), h("small", FILE_INFO[name] || "", name === "dataset.hdf5" && o.manifest ? ` · ${Agri.bytes(o.manifest.size_bytes)}` : "")),
+      h("a.btn.sm", { href: Agri.fileUrl(o.id, name), download: true }, "Download")))));
+    if (o.manifest) el.append(h("p.caption", { style: "margin-top:12px;overflow-wrap:anywhere" },
+      `${o.manifest.episodes.toLocaleString()} episodes · ${o.manifest.frames.toLocaleString()} frames · ${o.manifest.worker} ${o.manifest.simulator_version} · sha256 ${o.manifest.sha256.slice(0, 16)}…`));
+  }
+  if (o.worker && o.worker.startsWith("mock")) el.append(h("p.caption", { style: "margin-top:12px" }, MOCK_NOTE));
+}
+
+function json(o, el) {
+  const copy = { ...o, job: o.job ? { job_id: o.job.job_id, episodes: `${o.job.episodes.length} episodes (omitted)` } : null };
+  if (copy.qa_metrics) copy.qa_metrics = { ...copy.qa_metrics, episodes: `${copy.qa_metrics.episodes.length} episodes (omitted)` };
+  el.append(h("pre", JSON.stringify(copy, null, 2)));
+}
+
+/* ---------------- actions ---------------- */
+
+async function act(kind, text) {
+  const id = selected;
+  try {
+    if (kind === "answer") {
+      if (!text) return composerTa.focus();
+      sendBtn.disabled = true;
+      await Agri.answer(id, text);
+      composerTa.value = ""; drafts[id] = "";
+    } else if (kind === "approve") {
+      await Agri.approve(id); toast("Spec approved. Production started."); tab = "overview";
+    } else if (kind === "continue") {
+      await Agri.cont(id); toast("AI data collection started."); tab = "data";
+    } else if (kind === "retry") {
+      await Agri.retry(id); toast("Retrying from the failed stage."); tab = "overview";
+    } else if (kind === "pay") {
+      await Agri.pay(id); toast("Paid (test mode). Files unlocked."); tab = "files";
+    } else if (kind === "checkout") {
+      const { url } = await Agri.checkout(id);
+      location.href = url;  // Stripe's hosted checkout page
+      return;
+    }
+  } catch (e) { toast(e.message); sendBtn.disabled = false; }
+  await refreshList(); detailSig = ""; await loadDetail();
+}
+
+function openModal() { $("scrim").classList.add("open"); $("mSubmit").disabled = false; setTimeout(() => $("mText").focus(), 0); }
+function closeModal() { $("scrim").classList.remove("open"); }
+$("newBtn").onclick = openModal;
+$("mCancel").onclick = closeModal;
+$("scrim").addEventListener("mousedown", (e) => { if (e.target === $("scrim")) closeModal(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+  if (e.key.toLowerCase() === "n" && !e.metaKey && !e.ctrlKey && !e.altKey && !/TEXTAREA|INPUT|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); openModal(); }
+});
+$("mText").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) $("mSubmit").click(); });
+$("mSubmit").onclick = async () => {
+  const text = $("mText").value.trim();
+  if (!text) return $("mText").focus();
+  $("mSubmit").disabled = true;
+  try {
+    const o = await Agri.create(text, $("mAuto").checked);
+    $("mText").value = ""; closeModal();
+    view = "orders"; filter = "all";
+    await refreshList(); select(o.id, "conversation");
+  } catch (e) { $("mSubmit").disabled = false; toast("Could not create order: " + e.message); }
+};
+document.querySelectorAll(".nav[data-view]").forEach((b) => b.addEventListener("click", () => { view = b.dataset.view; renderList(); }));
+$("viewSelect").addEventListener("change", (e) => { view = e.target.value; closeDetail(); });
+
+/* ---------------- polling ---------------- */
+
+async function refreshList() {
+  try {
+    const items = await Agri.list();
+    const sig = JSON.stringify(items);
+    if (sig === listSig) return;
+    listSig = sig; summaries = items;
+    renderList();
+    if (selected && !full) renderDetail(true);
+  } catch (e) { /* server restarting; try again next tick */ }
+}
+const busy = (o) => o && (o.state === "running" || o.state === "needs_play");
+setInterval(() => { if (summaries.some(busy)) refreshList(); }, 3000);
+setInterval(() => { if (selected && (!full || busy(full))) loadDetail(); }, 2000);
+setInterval(() => document.querySelectorAll("[data-since]").forEach((el) => { el.textContent = Agri.elapsed(+el.dataset.since); }), 1000);
+
+Agri.config().then((c) => {
+  config = c;
+  $("demoPill").hidden = !c.demo;
+  $("simFoot").textContent = "Simulator: MuJoCo · AI players " + (String(c.worker).startsWith("mock") ? "mock" : c.worker);
+});
+Agri.examples().then((ex) => {
+  const labels = { cafe_order: "Example: cafe coffee serving (EN)", cafe_failure_order: "Example: failure repro (EN)" };
+  $("mEx").replaceChildren(...Object.keys(ex).map((k) => h("button", { onclick: () => { $("mText").value = ex[k].trim(); $("mText").focus(); } }, labels[k] || k)));
+});
+refreshList().then(renderList).then(async () => {
+  // Returning from a Stripe credit top-up: ?topup=success|cancel&session_id=<id>
+  const t = new URLSearchParams(location.search);
+  if (t.get("topup")) {
+    history.replaceState(null, "", location.pathname);
+    if (t.get("topup") === "success") {
+      try { const r = await Agri.walletConfirm(t.get("session_id")); wallet = r.wallet; toast(`Credits added via Stripe (test mode).`); }
+      catch (e) { toast(e.message); }
+    } else toast("Stripe checkout cancelled.");
+    const nav = document.querySelector('.nav[data-view="billing"]'); if (nav) nav.click();
+    return;
+  }
+  // Returning from Stripe Checkout: ?order=<id>&checkout=success|cancel&session_id=<id>
+  const p = new URLSearchParams(location.search), id = p.get("order"), res = p.get("checkout");
+  if (!id || !res) return;
+  history.replaceState(null, "", location.pathname);
+  if (res === "success") {
+    try { await Agri.confirm(id, p.get("session_id")); toast("Paid via Stripe (test mode). Files unlocked."); }
+    catch (e) { toast(e.message); }
+    await refreshList(); select(id, "files");
+  } else {
+    toast("Stripe checkout cancelled."); select(id, "billing");
+  }
+});
+if (USER) {
+  $("userChip").hidden = false;
+  $("userName").textContent = USER.name || USER.email;
+  $("userAv").textContent = (USER.name || USER.email || "?").trim()[0].toUpperCase();
+}
+$("signOut").onclick = (e) => { e.preventDefault(); try { localStorage.removeItem("wemine_user"); } catch (err) { /* storage blocked */ } location.href = "/"; };
+</script>
+</body>
+</html>

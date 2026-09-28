@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agriphilo · 3D 온실 수확 게임</title>
+  <script type="importmap">
+    {"imports":{"three":"/static/vendor/three.module.js"}}
+  </script>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;color:#163126;background:#e9f1e9}
+    *{box-sizing:border-box} body{margin:0} button,input{font:inherit} button{cursor:pointer;border:1px solid #a9cbb7;border-radius:8px;background:#fff;color:#163126;padding:9px 12px} button:hover{background:#e4f6e9} button:focus-visible,input:focus-visible{outline:3px solid #2b84cf;outline-offset:2px}
+    .shell{max-width:1280px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:15px}.top h1{margin:0;font-size:25px}.muted{color:#526b5e}.badge{display:inline-block;border-radius:999px;background:#fff1cf;color:#754c07;padding:5px 10px;font-size:12px;font-weight:800;white-space:nowrap}.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(290px,.75fr);gap:16px}.card{background:#fff;border:1px solid #cfdfd2;border-radius:13px;padding:15px;box-shadow:0 4px 16px #1a4b2310;min-width:0}.stack{display:grid;gap:16px;align-content:start} h2{font-size:16px;margin:0 0 10px}.scene{position:relative;background:#cde9dd;border-radius:9px;overflow:hidden} canvas{display:block;width:100%;height:460px}.scene-label{position:absolute;top:10px;left:10px;background:#ffffffe6;padding:5px 8px;border-radius:5px;font-size:12px;font-weight:700}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.primary{background:#1b7652;color:white;border-color:#1b7652;font-weight:700}.primary:hover{background:#13563c}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stat{background:#f1f8f2;padding:8px;border-radius:7px;font-size:12px}.stat strong{display:block;font-size:18px;font-variant-numeric:tabular-nums}.control{display:grid;gap:4px;margin:10px 0}.control label{display:flex;justify-content:space-between;font-size:13px;font-weight:600}.control input[type=range]{width:100%;accent-color:#18845b}.hint{font-size:12px;line-height:1.5;color:#526b5e}.kbd{font-family:ui-monospace,monospace;background:#eef3ee;padding:1px 4px;border-radius:4px}.fruit-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.fruit{background:#fce9e6;border-radius:999px;padding:3px 8px;font-size:12px;color:#9e3a32}.fruit.done{background:#e4f3e7;color:#157044}.notice{font-size:12px;line-height:1.5;margin-top:12px;color:#63736a}.qa.pass{color:#147a4f}.qa.fail{color:#b23930}.trace{overflow:auto;max-height:235px;border:1px solid #dde8df;border-radius:7px} table{width:100%;border-collapse:collapse;font-size:12px} th,td{text-align:left;padding:6px 7px;border-bottom:1px solid #ebefeb;white-space:nowrap} th{position:sticky;top:0;background:#f5f8f5}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.big{font-size:26px;font-weight:800;margin:2px 0;color:#1b7652} .error{color:#a62621;font-weight:700}
+    @media(max-width:800px){.layout{grid-template-columns:1fr}.top{display:block}.top .badge{margin-top:8px}canvas{height:360px}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <div class="top"><div><h1>3D 온실 로봇팔 수확 게임</h1><div class="muted">사람이 관절을 움직여 토마토를 집고, 입력과 관절 상태를 기록합니다.</div></div><span class="badge">3D 게임 프로토타입 · TEST MODE</span></div>
+  <div class="layout">
+    <div class="stack">
+      <section class="card"><h2>온실 장면</h2><div class="scene"><canvas id="world" aria-label="3D 온실과 로봇팔"></canvas><span class="scene-label" id="sceneLabel">시작 중…</span></div><div class="stats"><div class="stat">수확 점수<strong id="score">0 / 3</strong></div><div class="stat">가장 가까운 과일<strong id="distance">—</strong></div><div class="stat">입력 기록<strong id="tick">0 ticks</strong></div></div><div class="fruit-list" id="fruitList"></div><p class="notice">이 장면과 수확 판정은 게임용 근사치입니다. 물리 검증, 실제 로봇의 운동학·접촉 데이터, 로봇 학습 성능을 나타내지 않습니다.</p></section>
+      <section class="card"><h2>입력·상태 기록</h2><div class="trace"><table><thead><tr><th>Tick</th><th>시간</th><th>사람의 입력</th><th>관절각 (rad)</th><th>말단 XYZ</th><th>점수</th></tr></thead><tbody id="traceBody"><tr><td colspan="6" class="muted">관절을 움직이면 기록됩니다.</td></tr></tbody></table></div><div class="toolbar"><button id="downloadBtn" disabled>회차 JSON 다운로드</button><button id="qaBtn">재생 QA 실행</button></div></section>
+    </div>
+    <div class="stack">
+      <section class="card"><h2>사람의 조작</h2><div class="control"><label for="seed">온실 Seed <span class="hint">동일 seed → 동일 과일 위치</span></label><input id="seed" type="number" min="0" max="2147483647" step="1" value="28"></div><div class="toolbar"><button id="resetBtn">새 회차 시작</button></div><div class="control"><label for="yaw">Base yaw <span id="yawValue" class="mono"></span></label><input id="yaw" type="range" min="-0.8" max="0.8" step="0.01" value="0"></div><div class="control"><label for="shoulder">Shoulder <span id="shoulderValue" class="mono"></span></label><input id="shoulder" type="range" min="-0.45" max="1.1" step="0.01" value="0.75"></div><div class="control"><label for="elbow">Elbow <span id="elbowValue" class="mono"></span></label><input id="elbow" type="range" min="-1.3" max="1.3" step="0.01" value="-0.35"></div><div class="toolbar"><button class="primary" id="gripBtn">그리퍼 닫기 · Space</button></div><p class="hint">키보드: <span class="kbd">W/A/S/D</span> 로봇 베이스 이동, <span class="kbd">Q/E</span> yaw, <span class="kbd">R/F</span> shoulder, <span class="kbd">T/G</span> elbow, <span class="kbd">Space</span> 그리퍼 열기·닫기. 닫을 때 말단이 과일 중심에서 0.26 장면 단위 이내이면 수확합니다.</p><p class="hint" id="status">목표에 접근하세요.</p></section>
+      <section class="card"><h2>재생 QA</h2><p id="qa" class="qa muted">아직 검증 전</p><p class="hint">Seed로 장면을 다시 만들고 기록된 입력을 순서대로 적용해 tick별 관절, 말단 위치, 수확 상태와 점수를 비교합니다.</p></section>
+      <section class="card"><h2>보상 예시 <span class="badge">TEST MODE</span></h2><div class="big" id="reward">$0.00</div><p class="hint">QA 통과 시 게임 점수 × $0.25를 표시합니다. 실제 결제·청구·외부 전송은 없습니다.</p></section>
+    </div>
+  </div>
+</main>
+<script type="module">
+import * as THREE from 'three';
+
+const $ = id => document.getElementById(id);
+const VERSION = 'agriphilo-greenhouse-3d-v1';
+const BASE_X = -1.8, SHOULDER_Y = 0.85, L1 = 1.35, L2 = 1.0, TOOL = 0.18, PICK_RADIUS = 0.26;
+const LIMITS = {yaw:[-0.8,0.8],shoulder:[-0.45,1.1],elbow:[-1.3,1.3]};
+const INITIAL = {yaw:0,shoulder:0.75,elbow:-0.35,closed:false};
+const round = x => Math.round(x * 10000) / 10000;
+const clone = x => JSON.parse(JSON.stringify(x));
+const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+const rngFor = seed => { let x = seed >>> 0; return () => { x += 0x6d2b79f5; let t=x; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; };
+function tip(angles,basePosition={x:BASE_X,z:0}) {
+  const a=angles.shoulder, b=angles.elbow;
+  const r=L1*Math.cos(a)+(L2+TOOL)*Math.cos(a+b);
+  return {x:round(basePosition.x+r*Math.cos(angles.yaw)),y:round(SHOULDER_Y+L1*Math.sin(a)+(L2+TOOL)*Math.sin(a+b)),z:round(basePosition.z-r*Math.sin(angles.yaw))};
+}
+function makeFruits(seed) {
+  const random=rngFor(seed);
+  return [{yaw:-0.32,shoulder:-0.12,elbow:0.7},{yaw:0,shoulder:0.06,elbow:0.5},{yaw:0.32,shoulder:-0.12,elbow:0.7}]
+    .map((target,i) => { const p=tip(target); return {id:`tomato-${i+1}`,x:round(p.x+(random()-.5)*0.08),y:round(p.y+(random()-.5)*0.08),z:round(p.z+(random()-.5)*0.08),harvested:false}; });
+}
+function initialState(seed) { return {angles:clone(INITIAL),base_position:{x:BASE_X,z:0},fruits:makeFruits(seed),score:0,tick:0}; }
+function distance(a,b) { return Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z); }
+function applyInput(prior,input) {
+  const next=clone(prior); next.tick++;
+  let harvestedFruitId=null;
+  if (input.type==='joint' && Object.hasOwn(LIMITS,input.joint) && Number.isFinite(input.value)) {
+    const [lo,hi]=LIMITS[input.joint]; next.angles[input.joint]=round(clamp(input.value,lo,hi));
+  } else if (input.type==='move' && Number.isFinite(input.dx) && Number.isFinite(input.dz)) {
+    next.base_position.x=round(clamp(next.base_position.x+input.dx,-3.2,2.0));
+    next.base_position.z=round(clamp(next.base_position.z+input.dz,-2.0,2.0));
+  } else if (input.type==='gripper' && typeof input.closed==='boolean') {
+    const wasClosed=next.angles.closed; next.angles.closed=input.closed;
+    if (!wasClosed && input.closed) {
+      const end=tip(next.angles,next.base_position);
+      const candidates=next.fruits.filter(f=>!f.harvested).map(f=>({fruit:f,d:distance(end,f)})).sort((a,b)=>a.d-b.d);
+      if (candidates.length && candidates[0].d<=PICK_RADIUS) { candidates[0].fruit.harvested=true; next.score++; harvestedFruitId=candidates[0].fruit.id; }
+    }
+  } else { throw Error('허용되지 않은 입력'); }
+  return {next,harvestedFruitId};
+}
+function snapshot(state,harvestedFruitId) {
+  return {tick:state.tick,robot_base_xz:clone(state.base_position),joint_angles_rad:{yaw:state.angles.yaw,shoulder:state.angles.shoulder,elbow:state.angles.elbow},gripper_closed:state.angles.closed,end_effector_xyz:tip(state.angles,state.base_position),fruit_states:state.fruits.map(f=>({id:f.id,harvested:f.harvested})),harvested_fruit_id:harvestedFruitId,score:state.score};
+}
+
+const canvas=$('world');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+renderer.setClearColor(0xc9e5df);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0xc9e5df);
+const camera=new THREE.PerspectiveCamera(43,1,0.1,100); camera.position.set(4.1,3.6,6.9); camera.lookAt(-0.1,1.35,0);
+scene.add(new THREE.HemisphereLight(0xffffff,0x729177,2.1));
+const sun=new THREE.DirectionalLight(0xffffff,2.1); sun.position.set(-3,7,4); scene.add(sun);
+function mat(color,opts={}) { return new THREE.MeshStandardMaterial({color,roughness:0.75,...opts}); }
+function box(w,h,d,color,x,y,z,parent=scene) { const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color)); mesh.position.set(x,y,z); parent.add(mesh); return mesh; }
+function sphere(radius,color,x,y,z,parent=scene) { const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,20,14),mat(color)); mesh.position.set(x,y,z); parent.add(mesh); return mesh; }
+box(8,0.12,5.8,0x9fbd98,0,-0.1,0);
+for (const z of [-2.45,2.45]) { box(7.9,0.06,0.06,0x94b4aa,0,0.12,z); for(const x of [-3.8,-1.2,1.4,3.8]) box(0.06,3.2,0.06,0x8ab5ab,x,1.55,z); }
+for (const x of [-3.8,3.8]) box(0.06,3.2,0.06,0x8ab5ab,x,1.55,0);
+for(const z of [-2.45,0,2.45]) box(7.9,0.06,0.06,0x8ab5ab,0,3.15,z);
+for(const z of [-0.75,0,0.75]) {
+  box(3.0,0.28,0.42,0x855c40,1.05,0.08,z);
+  for(const x of [0.35,1.15,1.95]) { box(0.05,1.15,0.05,0x39834d,x,0.77,z); sphere(0.22,0x3e9950,x,1.26,z); sphere(0.15,0x55ab60,x-0.18,1.04,z+0.11); }
+}
+box(0.65,0.25,0.65,0x355566,BASE_X,0.13,0);
+const base=new THREE.Group();base.position.set(BASE_X,0.25,0);scene.add(base);
+const baseCyl=new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.3,0.28,24),mat(0x406c7d));baseCyl.position.y=0.14;base.add(baseCyl);
+const shoulder=new THREE.Group();shoulder.position.y=0.6;base.add(shoulder);
+const jointA=sphere(0.2,0x284b59,0,0,0,shoulder);
+box(L1,0.21,0.23,0x69a8b3,L1/2,0,0,shoulder);
+const elbow=new THREE.Group();elbow.position.x=L1;shoulder.add(elbow);
+sphere(0.18,0x284b59,0,0,0,elbow);
+box(L2,0.17,0.19,0x8ac3c8,L2/2,0,0,elbow);
+const grip=new THREE.Group();grip.position.x=L2;elbow.add(grip);
+box(TOOL,0.14,0.22,0x455e69,TOOL/2,0,0,grip);
+const upperFinger=box(0.16,0.07,0.075,0xe9bd65,TOOL+0.04,0,0.14,grip);
+const lowerFinger=box(0.16,0.07,0.075,0xe9bd65,TOOL+0.04,0,-0.14,grip);
+const fruitMeshes=new Map();
+let episode,state,lastQA=null;
+function fruitVisuals() {
+  for (const mesh of fruitMeshes.values()) scene.remove(mesh);
+  fruitMeshes.clear();
+  for (const f of state.fruits) {
+    const group=new THREE.Group();group.position.set(f.x,f.y,f.z);
+    sphere(0.14,0xe35237,0,0,0,group);sphere(0.045,0x306b33,0,0.145,0,group);
+    scene.add(group);fruitMeshes.set(f.id,group);
+  }
+}
+function resize() { const w=canvas.clientWidth,h=canvas.clientHeight;if(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio())){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();} }
+function render() {
+  resize();base.position.set(state.base_position.x,0.25,state.base_position.z);base.rotation.y=state.angles.yaw;shoulder.rotation.z=state.angles.shoulder;elbow.rotation.z=state.angles.elbow;
+  const opening=state.angles.closed?0.07:0.18;upperFinger.position.z=opening;lowerFinger.position.z=-opening;
+  for(const f of state.fruits) fruitMeshes.get(f.id).visible=!f.harvested;
+  renderer.render(scene,camera);
+}
+function nearestFruit() { const end=tip(state.angles,state.base_position);const available=state.fruits.filter(f=>!f.harvested);return available.map(f=>({id:f.id,d:distance(end,f)})).sort((a,b)=>a.d-b.d)[0]||null; }
+function refresh() {
+  for(const key of ['yaw','shoulder','elbow']) { $(key).value=state.angles[key]; $(key+'Value').textContent=state.angles[key].toFixed(2)+' rad'; }
+  $('gripBtn').textContent=state.angles.closed?'그리퍼 열기 · Space':'그리퍼 닫기 · Space';
+  $('score').textContent=`${state.score} / ${state.fruits.length}`;
+  const near=nearestFruit(); $('distance').textContent=near?`${near.d.toFixed(2)} (${near.id})`:'모두 수확';
+  $('tick').textContent=`${state.tick} ticks`;
+  $('fruitList').innerHTML=state.fruits.map(f=>`<span class="fruit ${f.harvested?'done':''}">${f.id}: ${f.harvested?'수확':'대기'}</span>`).join('');
+  $('sceneLabel').textContent=state.score===state.fruits.length?'ALL HARVESTED':state.angles.closed?'GRIPPER CLOSED':'GRIPPER OPEN';
+  $('downloadBtn').disabled=episode.records.length===0;
+  $('traceBody').innerHTML=episode.records.length?episode.records.slice(-12).reverse().map(r=>`<tr><td>${r.tick}</td><td class="mono">${r.timestamp.slice(11,19)}</td><td>${r.input.type==='joint'?r.input.joint+' → '+r.input.value.toFixed(2):r.input.type==='move'?'base '+r.input.dx.toFixed(2)+', '+r.input.dz.toFixed(2):r.input.closed?'grip close':'grip open'}</td><td class="mono">${Object.values(r.joint_angles_rad).map(v=>v.toFixed(2)).join(', ')}</td><td class="mono">${Object.values(r.end_effector_xyz).map(v=>v.toFixed(2)).join(', ')}</td><td>${r.score}</td></tr>`).join(''):'<tr><td colspan="6" class="muted">관절을 움직이면 기록됩니다.</td></tr>';
+  $('status').textContent=episode.records.at(-1)?.harvested_fruit_id?`${episode.records.at(-1).harvested_fruit_id} 수확 성공!`:near?`가장 가까운 ${near.id}까지 ${near.d.toFixed(2)} 장면 단위. 접근 후 그리퍼를 닫으세요.`:'세 과일 모두 수확했습니다.';
+  $('reward').textContent=lastQA?.pass?`$${(state.score*0.25).toFixed(2)}`:'$0.00';
+  render();
+}
+function qaReplay(ep) {
+  const errors=[];
+  if(ep.schema!==VERSION) errors.push('스키마 버전 불일치');
+  if(!Number.isInteger(ep.seed)||ep.seed<0||ep.seed>2147483647) errors.push('잘못된 seed');
+  let replay=initialState(ep.seed);
+  if(JSON.stringify(replay.fruits)!==JSON.stringify(ep.initial_fruits)) errors.push('초기 과일 위치 불일치');
+  let priorTime='';
+  for(let i=0;i<ep.records.length;i++) {
+    const row=ep.records[i];
+    if(!row.timestamp||!Number.isFinite(Date.parse(row.timestamp))||row.timestamp<priorTime) errors.push(`tick ${i+1}: 시간 오류`);
+    priorTime=row.timestamp;
+    try {
+      const result=applyInput(replay,row.input);replay=result.next;
+      const expected=snapshot(replay,result.harvestedFruitId);
+      for(const [key,value] of Object.entries(expected)) if(JSON.stringify(row[key])!==JSON.stringify(value)) errors.push(`tick ${i+1}: ${key} 불일치`);
+    } catch(err) { errors.push(`tick ${i+1}: 입력 오류`);break; }
+  }
+  if(JSON.stringify(snapshot(replay,null))!==JSON.stringify(snapshot(ep.final_state,null))) errors.push('최종 상태 불일치');
+  return {pass:errors.length===0,errors,checked_ticks:ep.records.length,score:replay.score};
+}
+function updateQA() { lastQA=qaReplay(episode);$('qa').className='qa '+(lastQA.pass?'pass':'fail');$('qa').textContent=lastQA.pass?`PASS · ${lastQA.checked_ticks} ticks 재생 · 점수 ${lastQA.score} 일치`:`FAIL · ${lastQA.errors.slice(0,3).join('; ')}`;$('reward').textContent=lastQA.pass?`$${(state.score*0.25).toFixed(2)}`:'$0.00'; }
+function record(input) {
+  const result=applyInput(state,input);state=result.next;
+  episode.records.push({timestamp:new Date().toISOString(),input:clone(input),...snapshot(state,result.harvestedFruitId)});
+  episode.final_state=clone(state);
+  if(result.harvestedFruitId) $('status').textContent=result.harvestedFruitId+' 수확 성공!';
+  lastQA=null;refresh();updateQA();
+}
+function reset() {
+  const raw=Number($('seed').value);const seed=Number.isInteger(raw)?clamp(raw,0,2147483647):28;$('seed').value=seed;
+  state=initialState(seed);episode={schema:VERSION,kind:'browser_game_synthetic',seed,created_at:new Date().toISOString(),initial_fruits:clone(state.fruits),records:[],final_state:clone(state)};
+  lastQA=null;fruitVisuals();refresh();updateQA();
+}
+for(const key of ['yaw','shoulder','elbow']) $(key).addEventListener('input',()=>record({type:'joint',joint:key,value:Number($(key).value)}));
+$('gripBtn').addEventListener('click',()=>record({type:'gripper',closed:!state.angles.closed}));
+$('resetBtn').addEventListener('click',reset);
+$('qaBtn').addEventListener('click',updateQA);
+$('downloadBtn').addEventListener('click',()=>{ const data={...episode,qa:qaReplay(episode),test_mode_reward_usd:lastQA?.pass?round(state.score*0.25):0,disclaimer:'Synthetic browser game. No physical robot simulation, real sensor data, or payment.'};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`agriphilo-3d-seed-${episode.seed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); });
+document.addEventListener('keydown',event=>{
+  if(event.repeat||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
+  const keys={q:['yaw',-0.04],e:['yaw',0.04],r:['shoulder',0.04],f:['shoulder',-0.04],t:['elbow',0.04],g:['elbow',-0.04]};
+  const movement={w:[0,-0.12],a:[-0.12,0],s:[0,0.12],d:[0.12,0]};
+  const key=event.key.toLowerCase();
+  if(key===' ') {event.preventDefault();record({type:'gripper',closed:!state.angles.closed});return;}
+  if(movement[key]) {event.preventDefault();const [dx,dz]=movement[key];record({type:'move',dx,dz});return;}
+  if(keys[key]) {event.preventDefault();const [joint,delta]=keys[key];record({type:'joint',joint,value:round(state.angles[joint]+delta)});}
+});
+window.addEventListener('resize',render);
+window.Agriphilo3D={getEpisode:()=>clone(episode),qaReplay,tip,applyInput,reset};
+reset();
+</script>
+</body>
+</html>

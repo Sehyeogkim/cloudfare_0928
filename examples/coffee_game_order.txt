@@ -1,0 +1,2 @@
+We are training a mobile manipulator to help in office kitchens. We need teleoperated demonstrations of a robot picking up a mug from the counter and placing it under the coffee machine dispenser.
+Please collect 200 successful episodes with a wrist camera and a fixed view, joint states and actions. A single-arm robot similar to a Franka is fine.

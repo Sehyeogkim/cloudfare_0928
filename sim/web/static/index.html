@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WEMINE Player</title>
+<style>
+  :root { --bg:#0f1115; --panel:#181b22; --line:#2a2f3a; --text:#e6e8ee; --muted:#8b93a7; --accent:#e8a13a; --ok:#3fb67a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 -apple-system, "Pretendard", system-ui, sans-serif; }
+  header { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid var(--line); }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  .pill { font-size:12px; padding:2px 8px; border-radius:999px; background:#232834; color:var(--muted); }
+  .pill.live { color:var(--ok); }
+  main { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:16px; padding:16px 20px; }
+  .stage { position:relative; background:#000; border-radius:10px; overflow:hidden; aspect-ratio:16/9; }
+  .stage img { width:100%; height:100%; object-fit:contain; display:block; }
+  .hint { position:absolute; left:12px; top:12px; font-size:12px; color:#fff; background:rgba(0,0,0,.45); padding:4px 8px; border-radius:6px; }
+  .pipl { position:absolute; right:14px; bottom:calc(12px + 25% + 4px); font-size:11px; color:#fff; background:rgba(0,0,0,.45); padding:2px 6px; border-radius:4px; }
+  aside { display:flex; flex-direction:column; gap:12px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .card h2 { font-size:13px; margin:0 0 10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  ol { margin:0; padding-left:0; list-style:none; counter-reset:s; }
+  ol li { counter-increment:s; display:flex; gap:10px; align-items:flex-start; padding:6px 0; color:var(--muted); }
+  ol li::before { content:counter(s); flex:none; width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-size:12px; background:#232834; }
+  ol li.done { color:var(--text); } ol li.done::before { content:"✓"; background:var(--ok); color:#fff; }
+  ol li.cur { color:var(--text); } ol li.cur::before { background:var(--accent); color:#111; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  button { flex:1; min-width:70px; background:#232834; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 10px; cursor:pointer; font:inherit; }
+  button:hover { border-color:#3a4150; } button.on { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#111; border-color:var(--accent); font-weight:600; }
+  kbd { font:12px ui-monospace, monospace; background:#232834; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 5px; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; } td { padding:3px 0; color:var(--muted); } td:last-child { text-align:right; color:var(--text); }
+  .stats { display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:12.5px; color:var(--muted); } .stats b { color:var(--text); font-weight:600; }
+  .banner { display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:rgba(63,182,122,.15); color:var(--ok); font-size:13px; }
+  body.viewer .player-only { display:none !important; }
+  body.viewer main { grid-template-columns:minmax(0,1fr) 260px; padding:8px; gap:8px; }
+  body.viewer header { display:none; }
+  @media (max-width:900px) { main { grid-template-columns:1fr; padding:12px 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">WEMINE · CafeServeCoffee</h1>
+  <span class="pill" id="role">player</span>
+  <span class="pill" id="scene">MuJoCo</span>
+  <span id="conn" class="pill">connecting…</span>
+</header>
+<main>
+  <section>
+    <div class="stage" tabindex="0" id="stage">
+      <img id="view" alt="simulation view">
+      <div class="hint player-only">Click here, then drive with the keyboard</div>
+      <div class="pipl">wrist cam</div>
+    </div>
+  </section>
+  <aside>
+    <div class="card">
+      <h2>Task</h2>
+      <ol id="stages"></ol>
+      <div class="banner" id="done">✓ Task complete — submit the episode</div>
+    </div>
+    <div class="card">
+      <h2>Episode</h2>
+      <div class="stats">
+        <span>Steps <b id="steps">0</b></span><span>Time <b id="elapsed">0</b>s</span>
+        <span>Gripper <b id="grip">open</b></span><span>Game <b id="gid">–</b></span>
+        <span style="grid-column:1/-1">Last submit <b id="saved">–</b></span>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="reset" class="player-only">Reset</button>
+        <button id="save" class="primary player-only">Submit episode</button>
+      </div>
+    </div>
+    <div class="card player-only">
+      <h2>Camera</h2>
+      <div class="row" id="views">
+        <button data-v="overview">Front</button><button data-v="left">Left</button>
+        <button data-v="right">Right</button><button data-v="top">Top</button>
+      </div>
+    </div>
+    <div class="card player-only">
+      <h2>Controls</h2>
+      <table>
+        <tr><td>Arm forward/back · left/right</td><td><kbd>W</kbd><kbd>S</kbd> · <kbd>A</kbd><kbd>D</kbd></td></tr>
+        <tr><td>Arm up/down</td><td><kbd>R</kbd><kbd>F</kbd></td></tr>
+        <tr><td>Wrist rotate (yaw · pitch)</td><td><kbd>Q</kbd><kbd>E</kbd> · <kbd>Z</kbd><kbd>C</kbd></td></tr>
+        <tr><td>Gripper open/close</td><td><kbd>Space</kbd></td></tr>
+        <tr><td>Fine control</td><td><kbd>Shift</kbd> + move</td></tr>
+        <tr><td>Base move · turn</td><td><kbd>I</kbd><kbd>K</kbd><kbd>J</kbd><kbd>L</kbd> · <kbd>U</kbd><kbd>O</kbd></td></tr>
+      </table>
+    </div>
+  </aside>
+</main>
+<script>
+const params = new URLSearchParams(location.search);
+const ROLE = params.get('role') === 'viewer' ? 'viewer' : 'player';
+if (!params.has('role')) params.set('role', ROLE);
+document.body.classList.add(ROLE);
+document.getElementById('role').textContent = ROLE === 'player' ? 'Player view' : 'Viewer';
+const img = document.getElementById('view'), stage = document.getElementById('stage');
+const conn = document.getElementById('conn');
+let ws, keys = new Set(), lastUrl = null;
+const MOVE = new Set(['w','a','s','d','r','f','q','e','z','c','i','j','k','l','u','o','shift']);
+
+function connect() {
+  ws = new WebSocket(`ws://${location.host}/ws?${params}`);
+  ws.binaryType = 'blob';
+  ws.onopen = () => { conn.textContent = 'live'; conn.classList.add('live'); if (ROLE === 'player') stage.focus(); };
+  ws.onclose = () => { conn.textContent = 'disconnected'; conn.classList.remove('live'); setTimeout(connect, 1500); };
+  ws.onmessage = ev => {
+    if (typeof ev.data === 'string') return render(JSON.parse(ev.data));
+    const url = URL.createObjectURL(ev.data);
+    img.src = url; if (lastUrl) URL.revokeObjectURL(lastUrl); lastUrl = url;
+  };
+}
+const send = o => ws && ws.readyState === 1 && ws.send(JSON.stringify(o));
+const sendKeys = () => send({type:'keys', keys:[...keys]});
+
+function render(s) {
+  const ol = document.getElementById('stages');
+  if (ol.children.length !== s.stages.length) ol.innerHTML = s.stages.map(t => `<li>${t}</li>`).join('');
+  [...ol.children].forEach((li, i) => { li.className = i < s.stage ? 'done' : i === s.stage ? 'cur' : ''; });
+  document.getElementById('done').style.display = s.stage >= s.stages.length ? 'block' : 'none';
+  document.getElementById('steps').textContent = s.steps;
+  document.getElementById('elapsed').textContent = s.elapsed;
+  document.getElementById('grip').textContent = s.grip;
+  document.getElementById('saved').textContent = s.saved || '–';
+  document.getElementById('gid').textContent = s.game_id;
+  document.getElementById('title').textContent = `WEMINE · ${s.task}`;
+  document.getElementById('scene').textContent = `layout ${s.layout} · style ${s.style} · MuJoCo`;
+  document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === s.view));
+}
+
+stage.addEventListener('keydown', e => {
+  const k = e.key === 'Shift' ? 'shift' : e.key.toLowerCase();
+  if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) send({type:'grip'}); return; }
+  if (MOVE.has(k)) { e.preventDefault(); if (!keys.has(k)) { keys.add(k); sendKeys(); } }
+});
+stage.addEventListener('keyup', e => {
+  const k = e.key === 'Shift' ? 'shift' : e.key.toLowerCase();
+  if (keys.delete(k)) sendKeys();
+});
+stage.addEventListener('blur', () => { keys.clear(); sendKeys(); });
+stage.addEventListener('click', () => stage.focus());
+document.getElementById('reset').onclick = () => { send({type:'reset'}); stage.focus(); };
+document.getElementById('save').onclick = () => { send({type:'submit'}); stage.focus(); };
+document.querySelectorAll('#views button').forEach(b => b.onclick = () => { send({type:'view', view:b.dataset.v}); stage.focus(); });
+connect();
+</script>
+</body>
+</html>

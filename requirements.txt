@@ -1,0 +1,5 @@
+httpx
+pydantic>=2
+numpy
+h5py
+pillow

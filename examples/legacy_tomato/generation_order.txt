@@ -1,0 +1,3 @@
+We are building a tomato-picking arm (UR5e with a soft gripper) for Dutch greenhouses.
+We need simulated training data for the approach phase: lots of variety in how much the fruit is hidden by leaves, where it hangs, and lighting from dawn to midday.
+Our wrist camera sometimes shifts a few centimeters after maintenance, so please cover that too. We want RGB-D plus segmentation, and robot joint states and actions.

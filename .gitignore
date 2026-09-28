@@ -1,0 +1,15 @@
+.env
+.venv/
+out/
+__pycache__/
+runs/
+.pytest_cache/
+
+# Keep the custom game source in Git; download upstream packages/assets locally.
+sim/.venv/
+sim/third_party/
+sim/renders/
+sim/data/
+sim/*.log
+sim/web/*.log
+sim/MUJOCO_LOG.TXT

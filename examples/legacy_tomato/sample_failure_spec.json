@@ -1,0 +1,70 @@
+{
+  "mode": "failure",
+  "robot": {
+    "sim_model": "franka_panda",
+    "customer_robot": null
+  },
+  "task": "tomato_pregrasp",
+  "scene_template": "greenhouse_tomato_v1",
+  "reference_failure": {
+    "source": "text description of field video (no video/log file attached)",
+    "description": "온실에서 로봇이 목표 토마토에 접근하는 동안 두 번 연속 실패. 오후 늦게 창문 쪽에서 역광이 들어와 토마토가 어둡게 보였고, 목표 토마토의 절반 이상이 잎에 가려져 있었으며, 그리퍼가 접근 중 잎이 달린 줄기에 부딪혀 정지함.",
+    "observed_conditions": [
+      {
+        "axis": "lighting",
+        "value": "오후 늦게 창문 방향 역광, 토마토가 어둡게 보임 (backlit, low/dark illumination on target)"
+      },
+      {
+        "axis": "leaf_occlusion",
+        "value": "목표 토마토의 절반 이상(>50%)이 잎에 가려짐"
+      }
+    ]
+  },
+  "randomization": {
+    "leaf_occlusion": {
+      "min": 0.5,
+      "max": 0.85
+    },
+    "fruit_position_offset_m": {
+      "min": -0.05,
+      "max": 0.05
+    },
+    "lighting_lux": {
+      "min": 50.0,
+      "max": 300.0
+    },
+    "camera_pose_offset_m": {
+      "min": -0.03,
+      "max": 0.03
+    }
+  },
+  "episode_count": 200,
+  "sensors": [
+    "rgb",
+    "depth",
+    "instance_segmentation",
+    "joint_state",
+    "action",
+    "object_pose",
+    "contacts"
+  ],
+  "success_rule": {
+    "type": "pregrasp_reached",
+    "position_tolerance_m": 0.02,
+    "time_limit_s": 20.0,
+    "forbid_collisions": true
+  },
+  "output_format": "hdf5",
+  "assumptions": [
+    "fruit_position_offset_m 범위는 관찰되지 않아 기본값(±5cm)으로 설정",
+    "camera_pose_offset_m 범위는 관찰되지 않아 기본값(±3cm)으로 설정",
+    "lighting_lux 범위(50~300lux)는 '역광으로 어둡게 보임' 묘사를 기준으로 낮은 조도 대역으로 설정",
+    "leaf_occlusion 범위(0.5~0.85)는 '절반 이상 가려짐' 관찰을 중심으로 설정",
+    "episode_count는 규모 언급이 없어 기본값 200으로 설정",
+    "그리퍼-줄기 충돌 실패를 평가하기 위해 기본 센서 목록에 contacts 센서를 추가",
+    "success_rule/센서 등 언급 없는 항목은 기본값 적용"
+  ],
+  "out_of_scope": [
+    "줄기 절단(stem cutting) 동작 및 관련 데이터는 이번 파일럿 범위에 포함되지 않음 (fruit detachment/damage physics 미지원)"
+  ]
+}
