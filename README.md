@@ -1,8 +1,8 @@
-![WEMINE: request a robot task, build a simulated game, play it, verify the demonstration, and deliver robot data](docs/assets/wemine-overview.png)
+![WEMINE connects two roles: a requester defines a robot task, WEMINE builds and publishes the game, a separate player performs it, and validated data returns to the requester](docs/assets/wemine-overview.png)
 
 # WEMINE
 
-**Play a robot task. Capture useful robot data.** WEMINE is a prototype marketplace connecting teams that need robot demonstrations with people who can create them by playing a simulation. This hackathon pilot asks a player to control a mobile robot arm in a café and move a coffee mug onto a tray.
+**Play a robot task. Capture useful robot data.** A requester describes the virtual robot task and data they need. WEMINE builds and publishes the game for a separate player to play, then validates the demonstration and delivers data back to the requester. In this hackathon pilot, the player controls a mobile robot arm in a café to move a coffee mug onto a tray.
 
 > **Start here:** the requester console is at **http://127.0.0.1:8000** and the playable MuJoCo game is at **http://127.0.0.1:8010/?role=player**. They are separate local servers; run both for the full demo.
 
