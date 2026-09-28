@@ -32,7 +32,7 @@ PAGES = {
 }
 PLAYER_ROUTE = re.compile(r"/api/players/([a-z0-9._-]{1,120})")
 GAME_ROUTE = re.compile(r"/api/games/([0-9a-f]{12})(?:/(approve|close))?")
-ORDER_ROUTE = re.compile(r"/api/orders/([0-9a-f-]{36})(?:/(answer|approve|continue|pay|checkout|confirm|retry|files/[\w.]+))?")
+ORDER_ROUTE = re.compile(r"/api/orders/([0-9a-f-]{36})(?:/(answer|approve|purchase|close|reopen|retry|files/[\w.]+))?")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -197,7 +197,7 @@ class Handler(BaseHTTPRequestHandler):
         order, action = self._order()
         if order is False:
             return self._json(404, {"error": "unknown order"})
-        if not order or action not in ("answer", "approve", "continue", "pay", "checkout", "confirm", "retry"):
+        if not order or action not in ("answer", "approve", "purchase", "close", "reopen", "retry"):
             return self._json(404, {"error": "not found"})
         try:
             if action == "answer":
@@ -206,16 +206,13 @@ class Handler(BaseHTTPRequestHandler):
                 order.approve()
             elif action == "retry":
                 order.retry()
-            elif action == "continue":
-                order.continue_play()
-            elif action == "checkout":
-                origin = f"http://{self.headers.get('Host', 'localhost:8000')}"
-                return self._json(200, {"url": order.start_checkout(origin)})
-            elif action == "confirm":
-                order.confirm_checkout(str(body.get("session_id", "")))
+            elif action == "purchase":
+                order.purchase(int(body.get("count", 0)))
+            elif action == "reopen":
+                order.reopen_listing()
             else:
-                order.pay()
-        except RuntimeError as e:
+                order.close_listing()
+        except (RuntimeError, ValueError) as e:  # InsufficientCredits is a RuntimeError
             return self._json(409, {"error": str(e)})
         except Exception as e:
             return self._json(502, {"error": str(e)})

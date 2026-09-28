@@ -111,7 +111,7 @@ td.stage-c { white-space: nowrap; color: var(--ink-2); font-size: 12.5px; max-wi
 .d-meta .x { margin-left: auto; border: 0; background: none; color: var(--muted); padding: 4px 6px; border-radius: 5px; font-family: var(--font); }
 .d-meta .x:hover { background: var(--hover); color: var(--ink); }
 .d-title { font-size: 15.5px; font-weight: 600; margin: 8px 0 12px; line-height: 1.35; overflow-wrap: anywhere; }
-.pipe { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; margin-bottom: 12px; }
+.pipe { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-bottom: 12px; }
 .pipe div { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pipe div::before { content: ""; display: block; height: 4px; border-radius: 2px; background: var(--line); margin-bottom: 6px; }
 .pipe .done { color: var(--ink-2); }
@@ -247,6 +247,30 @@ ol.steps li::before { content: counter(s); flex: none; width: 20px; height: 20px
 .prog { height: 8px; background: var(--line-2); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
 .prog div { height: 100%; background: var(--blue); border-radius: 4px; transition: width .4s; }
 
+/* marketplace */
+.mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; padding: 20px; }
+.mcard { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.mcard.own { cursor: pointer; }
+.mcard.own:hover { border-color: #c9b7a3; box-shadow: 0 6px 20px rgba(59,36,22,.08); }
+.mcard .mimg { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: var(--line-2); }
+.mcard .mph { width: 100%; aspect-ratio: 16 / 9; display: grid; place-items: center; background: var(--line-2); color: var(--muted); font-size: 12px; }
+.mcard .mb { padding: 14px 14px 16px; display: grid; gap: 8px; flex: 1; align-content: start; }
+.mcard .mt { display: flex; align-items: center; gap: 8px; }
+.mcard .mt b { font-size: 14.5px; flex: 1; min-width: 0; }
+.mcard ol { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 12.5px; }
+.mcard .ms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; border-top: 1px solid var(--line-2); padding-top: 8px; }
+.mcard .ms div small { display: block; color: var(--muted); font-size: 11px; }
+.mcard .ms div b { font-weight: 600; font-size: 13px; }
+.mcard .mf { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.mine { font-size: 11px; font-weight: 600; color: var(--blue); background: var(--blue-bg); border-radius: 999px; padding: 1px 8px; }
+.buy { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--bg); display: grid; gap: 10px; }
+.buy .row1 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.buy input[type=number] { width: 90px; font: inherit; border: 1px solid var(--line); border-radius: 7px; padding: 5px 8px; background: var(--panel); }
+.buy .tot { font-size: 18px; font-weight: 700; }
+.thumb { width: 120px; max-width: 120px; border-radius: 5px; border: 1px solid var(--line); display: block; }
+.stars { color: #d9922b; letter-spacing: 1px; white-space: nowrap; }
+.stars .off { color: var(--line); }
+
 /* conversation */
 .msgs { display: flex; flex-direction: column; gap: 14px; }
 .msg { display: flex; gap: 10px; }
@@ -319,11 +343,9 @@ pre { margin: 0; font: 11.5px/1.55 var(--mono); background: var(--bg); border: 1
   <aside class="side">
     <div class="ws"><div class="logo" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 12.5 8 6.5 11 12.5 14 3.5"/></svg></div><div><b>WEMINE</b><small>Cafe robot pilot · MuJoCo</small></div></div>
     <button class="nav" data-view="orders"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M5 6h6M5 8.5h6M5 11h3.5"/></svg>Orders<span class="count" id="cOrders">0</span></button>
-    <div class="nav-h">Deliverables</div>
-    <button class="nav" data-view="datasets"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="8" cy="4" rx="5" ry="2"/><path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/></svg>Datasets<span class="count" id="cDatasets">0</span></button>
-    <button class="nav" data-view="qa"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.8 13.5 4v4c0 3-2.4 5.3-5.5 6.2C4.9 13.3 2.5 11 2.5 8V4z"/><path d="m5.5 8 1.8 1.8L10.8 6"/></svg>QA reports<span class="count" id="cQa">0</span></button>
+    <button class="nav" data-view="market"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 6.5 3.5 3h9l1 3.5"/><path d="M2.5 6.5h11a0 0 0 0 1 0 0 2 2 0 0 1-3.7 1 2 2 0 0 1-3.6 0 2 2 0 0 1-3.7-1z"/><path d="M3.5 8.5V13h9V8.5"/></svg>Marketplace<span class="count" id="cMarket">0</span></button>
     <div class="nav-h">Account</div>
-    <button class="nav" data-view="billing"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3.5" width="12.4" height="9" rx="1.5"/><path d="M1.8 6.5h12.4"/></svg>Billing<span class="count" id="cBilling">0</span></button>
+    <button class="nav" data-view="billing"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3.5" width="12.4" height="9" rx="1.5"/><path d="M1.8 6.5h12.4"/></svg>Billing<span class="count" id="cBilling"></span></button>
     <div class="side-foot">
       <div class="live"><i></i>Agents: Brainbase · Cloudflare sandbox</div>
       <div id="simFoot">Simulator: …</div>
@@ -334,8 +356,7 @@ pre { margin: 0; font: 11.5px/1.55 var(--mono); background: var(--bg); border: 1
     <header class="top">
       <h1 id="viewTitle">Orders</h1>
       <select id="viewSelect" aria-label="View">
-        <option value="orders">Orders</option><option value="datasets">Datasets</option>
-        <option value="qa">QA reports</option><option value="billing">Billing</option>
+        <option value="orders">Orders</option><option value="market">Marketplace</option><option value="billing">Billing</option>
       </select>
       <div class="tabs" id="filters"></div>
       <div class="spacer"></div>
@@ -378,26 +399,22 @@ const STATE = {
   running: ["b-blue b-run", "In progress"],
   needs_reply: ["b-amber", "Needs reply"],
   needs_approval: ["b-amber", "Approve spec"],
-  needs_play: ["b-amber", "Play demo"],
-  awaiting_payment: ["b-blue", "Awaiting payment"],
-  delivered: ["b-green", "Delivered"],
+  live: ["b-green", "Live in marketplace"],
+  closed: ["b-gray", "Listing closed"],
   failed: ["b-red", "Failed"],
 };
-const ACTION = ["needs_reply", "needs_approval", "needs_play", "awaiting_payment"];
+const ACTION = ["needs_reply", "needs_approval"];
 const FILTERS = [["all", "All", () => true], ["action", "Action needed", (o) => ACTION.includes(o.state)],
-  ["running", "In progress", (o) => o.state === "running"], ["delivered", "Delivered", (o) => o.state === "delivered"]];
-const VIEWS = { orders: "Orders", datasets: "Datasets", qa: "QA reports", billing: "Billing" };
+  ["running", "In progress", (o) => o.state === "running"], ["live", "Live", (o) => o.state === "live"]];
+const VIEWS = { orders: "Orders", market: "Marketplace", billing: "Billing" };
 const TABS = [["overview", "Overview"], ["conversation", "Conversation"], ["spec", "Spec"], ["plan", "Plan"], ["scene", "Scene"],
-  ["play", "Play"], ["data", "Data"], ["qa", "QA"], ["billing", "Billing"], ["files", "Files"], ["json", "JSON"]];
-const VERDICT = { pass: ["b-green", "Pass"], pass_with_notes: ["b-amber", "Pass with notes"], fail: ["b-red", "Fail"] };
+  ["market", "Marketplace"], ["files", "Files"], ["json", "JSON"]];
+const QA_BADGE = { pass: ["b-green", "Pass"], fail: ["b-red", "Fail"], pending: ["b-gray", "Checking…"] };
 const FILE_INFO = {
-  "dataset.hdf5": "Episodes: camera RGB, joint states, end-effector pose, actions, task stages",
-  "manifest.json": "Episode and frame counts, sensors, sha256",
-  "qa_report.md": "QA verdict, findings and checks (readable)",
-  "qa_report.json": "QA report plus full computed metrics",
-  "spec.json": "The approved DatasetSpec",
+  "dataset.hdf5": "All purchased episodes: states, actions and camera frames (collect_demos format)",
+  "manifest.json": "Purchased episode list, players, QA verdicts, sha256",
+  "qa_report.json": "QA Agent verdict, quality and reason for every purchased episode",
 };
-const MOCK_NOTE = "AI-player episodes come from a mock worker (synthetic trajectories and frames) for this demo. The human episode is recorded in the real MuJoCo scene.";
 
 let config = { demo: false, worker: "", pricing_note: "" };
 let summaries = [];
@@ -418,7 +435,8 @@ function badge(state) {
   const [cls, label] = STATE[state] || ["b-gray", state];
   return h("span.badge." + cls.split(" ").join("."), h("i"), label);
 }
-const vbadge = (v) => { const [c, l] = VERDICT[v] || ["b-gray", v]; return h("span.badge." + c, h("i"), l); };
+const qbadge = (v) => { const [c, l] = QA_BADGE[v] || ["b-gray", v]; return h("span.badge." + c, h("i"), l); };
+const stars = (n) => n == null ? h("span.kv", "—") : h("span.stars", { title: `${n} / 5` }, "★".repeat(n), h("span.off", "★".repeat(5 - n)));
 const modeLabel = (o) => o.spec ? (o.spec.mode === "failure" ? "Failure repro" : "Generation") : "—";
 const since = (ts) => h("span", { "data-since": ts }, Agri.elapsed(ts));
 const kpi = (k, v) => h("div.kpi", h("small", k), h("b", { title: String(v) }, v));
@@ -437,9 +455,7 @@ function currentStage(o) {
 function renderNav() {
   const hot = summaries.filter((o) => ACTION.includes(o.state)).length;
   $("cOrders").replaceChildren(hot ? h("span.hotpill", { title: `${hot} need your action` }, hot) : "", String(summaries.length));
-  $("cDatasets").textContent = summaries.filter((o) => o.state === "delivered").length;
-  $("cQa").textContent = summaries.filter((o) => o.qa_report).length;
-  $("cBilling").textContent = summaries.filter((o) => o.quote).length;
+  $("cMarket").textContent = market ? market.filter((m) => m.status === "live").length : summaries.filter((o) => o.state === "live").length;
   document.querySelectorAll(".nav[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
   $("viewTitle").textContent = VIEWS[view];
   $("viewSelect").value = view;
@@ -457,11 +473,17 @@ function rowAttrs(o, openTab) {
 function renderList() {
   renderNav();
   const list = $("list");
+  if (view === "market") { renderMarket(); return; }
+  if (view === "billing") {
+    setList(walletCard(), h("p.caption", { style: "padding:0 20px" }, `Credits pay for new environments (environment fee) and for QA-passed episodes you buy in the marketplace. ${config.pricing_note || ""}`));
+    if (!wallet || Date.now() - walletAt > 5000) loadWallet();
+    return;
+  }
   if (!summaries.length) {
     list.replaceChildren(h("div.empty", h("div.box",
       h("div.ill", { html: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3v3M11 3v3"/></svg>' }),
       h("h2", "No orders yet"),
-      h("p", "Tell us the robot, the task, the environment and the data you need. The agents turn it into a spec, a MuJoCo plan, a cafe scene, a playable game, episodes, QA and a quote."),
+      h("p", "Tell us the robot, the task, the environment and the data you need. The agents turn it into a spec, a MuJoCo plan and a cafe scene, then publish it as a game in the marketplace. Players play it, the QA Agent checks every episode, and you buy the episodes you want."),
       h("button.btn.primary", { onclick: openModal }, "Create first order"))));
     return;
   }
@@ -478,42 +500,35 @@ function renderList() {
     setList(table, rows.length ? null : h("div.none", "No orders match this filter."));
     return;
   }
-  if (view === "datasets") {
-    const rows = summaries.filter((o) => o.state === "delivered");
-    table = h("table",
-      h("thead", h("tr", h("th", "ID"), h("th", "Request"), h("th.r", "Episodes"), h("th.hide-m", "Size"), h("th", "Download"))),
-      h("tbody", rows.map((o) => h("tr", rowAttrs(o, "files"),
-        h("td.id", Agri.shortId(o.id)), h("td.req", Agri.title(o.text)),
-        h("td.num", o.manifest ? o.manifest.episodes.toLocaleString() : "—"),
-        h("td.sub.hide-m", o.manifest ? Agri.bytes(o.manifest.size_bytes) : "—"),
-        h("td", { onclick: (e) => e.stopPropagation() }, h("div", { style: "display:flex;gap:6px" },
-          h("a.btn.sm", { href: Agri.fileUrl(o.id, "dataset.hdf5"), download: true }, "HDF5"),
-          h("a.btn.sm.hide-m", { href: Agri.fileUrl(o.id, "qa_report.md"), download: true }, "QA report")))))));
-    setList(table, rows.length ? null : h("div.none", "No delivered datasets yet. Datasets appear here once an order is paid."));
-    return;
-  }
-  if (view === "qa") {
-    const rows = summaries.filter((o) => o.qa_report);
-    table = h("table",
-      h("thead", h("tr", h("th", "ID"), h("th", "Verdict"), h("th", "Headline"), h("th.hide-m", "Episodes"))),
-      h("tbody", rows.map((o) => h("tr", rowAttrs(o, "qa"),
-        h("td.id", Agri.shortId(o.id)), h("td", vbadge(o.qa_report.verdict)),
-        h("td.req", { title: o.qa_report.headline }, o.qa_report.headline),
-        h("td.num.hide-m", o.manifest ? o.manifest.episodes.toLocaleString() : "—")))));
-    setList(table, rows.length ? null : h("div.none", "No QA reports yet."));
-    return;
-  }
-  const rows = summaries.filter((o) => o.quote);
-  table = h("table",
-    h("thead", h("tr", h("th", "ID"), h("th", "Request"), h("th.r", "Total"), h("th", "Status"), h("th.hide-m", "Reference"))),
-    h("tbody", rows.map((o) => h("tr", rowAttrs(o, "billing"),
-      h("td.id", Agri.shortId(o.id)), h("td.req", Agri.title(o.text)),
-      h("td.num", { style: "font-weight:600" }, Agri.usd(o.quote.total_usd)),
-      h("td", o.payment ? h("span.badge.b-green", h("i"), o.payment.mode === "stripe_test" ? "Paid (Stripe test)" : "Paid (test)") : o.state === "awaiting_payment" ? h("span.badge.b-blue", h("i"), "Awaiting payment") : badge(o.state)),
-      h("td.id.hide-m", o.payment ? o.payment.reference : "—")))));
-  setList(walletCard(), h("h3", { style: "margin:18px 20px 8px;font-size:13px" }, "Order payments"), table,
-    rows.length ? null : h("div.none", "No quotes yet. The Payment Agent quotes each order after QA."), h("p.caption", { style: "padding:0 20px" }, config.pricing_note));
-  if (!wallet || Date.now() - walletAt > 5000) loadWallet();
+}
+
+/* ---------------- marketplace (all listings) ---------------- */
+
+let market = null, marketAt = 0;
+async function loadMarket() {
+  marketAt = Date.now();
+  try { market = await Agri.marketplace(); if (view === "market") renderList(); else renderNav(); } catch (e) { /* retry on next render */ }
+}
+function marketCard(m) {
+  const own = summaries.some((o) => o.id === m.order_id);
+  return h("article.mcard" + (own ? ".own" : ""), own ? { onclick: () => select(m.order_id, "market"), title: "Open your listing" } : {},
+    m.scene_image_url ? h("img.mimg", { src: m.scene_image_url, alt: "MuJoCo render of the game scene", loading: "lazy" }) : h("div.mph", "Scene preview pending"),
+    h("div.mb",
+      h("div.mt", h("b", m.title), own ? h("span.mine", "Your listing") : null, badge(m.status)),
+      h("div.kv", { style: "font-size:12.5px" }, `${m.robot} · ${m.scene}`),
+      m.task_steps && m.task_steps.length ? h("ol", m.task_steps.map((t) => h("li", t))) : null,
+      h("div.ms",
+        h("div", h("small", "Submitted"), h("b", (m.episodes_submitted || 0).toLocaleString())),
+        h("div", h("small", "QA passed"), h("b", (m.episodes_passed || 0).toLocaleString())),
+        h("div", h("small", "Available"), h("b", (m.episodes_available || 0).toLocaleString()))),
+      h("div.mf", h("span", `Player reward ${credits(m.reward_per_episode)}`), h("span", "·"), h("span", `Price ${credits(m.episode_price)} / episode`))));
+}
+function renderMarket() {
+  if (!market || Date.now() - marketAt > 5000) loadMarket();
+  if (!market) { setList(h("div.none", "Loading the marketplace…")); return; }
+  setList(
+    h("p.caption", { style: "padding:16px 20px 0;margin:0" }, "Every published game. Players pick one and play it in the browser; the QA Agent checks each episode. Open your own listing to buy its QA-passed episodes."),
+    market.length ? h("div.mgrid", market.map(marketCard)) : h("div.none", "No games are published yet. Approve an order's spec: once the Environment Agent builds the scene, the game appears here."));
 }
 
 /* ---------------- wallet (credits, Stripe top-up) ---------------- */
@@ -531,7 +546,7 @@ async function topUp(credits, btn) {
     await Agri.walletTestTopup(credits); toast(`Added ${credits.toLocaleString()} test credits.`); await loadWallet();
   } catch (e) { toast(e.message); btn.disabled = false; }
 }
-const LEDGER_LABEL = { topup: "Top-up", hold: "Held for order", release: "Released", capture: "Episode charged", refund: "Refund", token_cost: "AI tokens" };
+const LEDGER_LABEL = { topup: "Top-up", fee: "Environment fee", purchase: "Episodes purchased", reward: "Player reward", hold: "Held for order", release: "Released", capture: "Episode charged", refund: "Refund", token_cost: "AI tokens" };
 function walletCard() {
   if (!wallet) return h("div.wallet", h("span.caption", "Loading wallet…"));
   const me = `wallet:${wallet.customer_id}`;
@@ -555,7 +570,7 @@ function walletCard() {
 
 /* ---------------- detail ---------------- */
 
-const DEFAULT_TAB = { needs_reply: "conversation", needs_approval: "spec", needs_play: "play", awaiting_payment: "billing" };
+const DEFAULT_TAB = { needs_reply: "conversation", needs_approval: "spec", live: "market", closed: "market" };
 
 function select(id, openTab) {
   if (selected !== id) { selected = id; full = null; detailSig = ""; composerTa.value = drafts[id] || ""; }
@@ -590,18 +605,15 @@ function pipeline(o) {
 function actionBar(o) {
   if (o.state === "needs_reply") return h("div.actbar.warn", h("span.msg-t", "The Customer Agent asked a few questions before it drafts the spec."),
     tab !== "conversation" ? h("button.btn.sm", { onclick: () => setTab("conversation") }, "Reply to agent") : null);
-  if (o.state === "needs_approval") return h("div.actbar.warn", h("span.msg-t", "Review the spec. Approving holds credits and hands the order to the Orchestrator Agent."),
+  if (o.state === "needs_approval") return h("div.actbar.warn", h("span.msg-t", "Review the spec. Approving pays the environment fee and hands the order to the Orchestrator Agent."),
     tab !== "spec" ? h("button.btn.sm", { onclick: () => setTab("spec") }, "Review spec") : null,
     approveBtn(o));
-  if (o.state === "needs_play") return h("div.actbar.warn", h("span.msg-t", "A human player demonstrates the task in the browser game. Submit an episode from the player view, then continue."),
-    tab !== "play" ? h("button.btn.sm", { onclick: () => setTab("play") }, "Open play") : null,
-    h("button.btn.go.sm", { onclick: (e) => { e.target.disabled = true; act("continue"); } }, "Continue to AI data collection"));
-  if (o.state === "awaiting_payment") return h("div.actbar.info", h("span.msg-t", "QA is done and the quote is ready. Paying unlocks the files."),
-    tab !== "billing" ? h("button.btn.sm", { onclick: () => setTab("billing") }, "View quote") : null,
-    h("button.btn.primary.sm", { onclick: (e) => { e.target.disabled = true; act("pay"); } }, `Pay ${Agri.usd(o.quote.total_usd)} (test mode)`));
-  if (o.state === "delivered") return h("div.actbar.ok", h("span.msg-t", `Delivered · ${o.manifest ? o.manifest.episodes.toLocaleString() + " episodes" : ""}`),
-    h("a.btn.sm", { href: Agri.fileUrl(o.id, "dataset.hdf5"), download: true }, "Dataset (HDF5)"),
-    h("a.btn.sm", { href: Agri.fileUrl(o.id, "qa_report.md"), download: true }, "QA report"));
+  if (o.state === "live" || o.state === "closed") {
+    const L = o.listing || {};
+    return h("div.actbar." + (o.state === "live" ? "ok" : "info"), h("span.msg-t",
+      o.state === "live" ? `Live in the marketplace · ${(L.available || 0).toLocaleString()} QA-passed episodes ready to buy` : `Listing closed · ${(L.purchased || 0).toLocaleString()} episodes purchased`),
+      tab !== "market" ? h("button.btn.sm", { onclick: () => setTab("market") }, "Open marketplace listing") : null);
+  }
   if (o.state === "failed") {
     const s = o.stages.find((x) => x.status === "failed");
     return h("div.actbar.err", h("span.msg-t", h("b", `${s ? s.label : "Order"} failed. `), s ? s.error : ""),
@@ -618,7 +630,7 @@ const credits = (v) => `${(+v || 0).toLocaleString(undefined, { maximumFractionD
 function approveBtn(o) {
   const c = o.credits || {};
   return h("button.btn.go.sm", { onclick: (e) => { e.target.disabled = true; act("approve"); } },
-    c.estimate != null ? `Approve spec & hold ${credits(c.estimate)}` : "Approve spec & start production");
+    c.environment_fee != null ? `Approve spec & pay ${credits(c.environment_fee)}` : "Approve spec & start production");
 }
 
 function renderDetail(keepScroll) {
@@ -632,8 +644,8 @@ function renderDetail(keepScroll) {
   const hadFocus = document.activeElement === composerTa;
   const body = h("div.d-body");
   if (!o) body.append(h("div.banner.muted", h("span.spin"), "Loading order…"));
-  else ({ overview, conversation, spec: specTab, plan: planTab, scene, play: playTab, data: dataTab, qa: qaTab, billing, files, json })[tab](o, body);
-  const attention = { conversation: o && o.state === "needs_reply", spec: o && o.state === "needs_approval", play: o && o.state === "needs_play", billing: o && o.state === "awaiting_payment" };
+  else ({ overview, conversation, spec: specTab, plan: planTab, scene, market: marketTab, files, json }[tab] || overview)(o, body);
+  const attention = { conversation: o && o.state === "needs_reply", spec: o && o.state === "needs_approval", market: o && o.state === "live" && o.listing && o.listing.available > 0 };
   const panel = h("aside.detail",
     h("div.d-head",
       h("div.d-meta", Agri.shortId(selected), s || o ? badge((o || s).state) : null,
@@ -654,8 +666,6 @@ function overview(o, el) {
   if (o.spec_summary) says.push(["Customer Agent", o.spec_summary]);
   if (o.orchestrator_summary) says.push(["Orchestrator Agent", o.orchestrator_summary]);
   if (o.plan_summary) says.push(["Environment Agent", o.plan_summary]);
-  if (o.qa_report) says.push(["QA Agent", o.qa_report.headline]);
-  if (o.quote_summary) says.push(["Payment Agent", o.quote_summary]);
   if (says.length) el.append(h("div.sec", h("h3", "What the agents said"), h("div.says",
     says.map(([who, text]) => h("div.say", h("small", h("i", who[0]), who), h("div", text))))));
   el.append(h("div.sec", h("h3", "Pipeline"), h("div.tl", o.stages.map((s) => {
@@ -725,9 +735,11 @@ function specTab(o, el) {
   if (s.assumptions.length) el.append(h("div.sec", h("h3", "Agent assumptions"), h("ul.lst", s.assumptions.map((a) => h("li", a)))));
   if (s.out_of_scope.length) el.append(h("div.sec", h("h3", "Not in this pilot"), h("div.banner.warn", h("ul.lst", { style: "color:inherit" }, s.out_of_scope.map((a) => h("li", a))))));
   const c = o.credits || {};
-  if (o.state === "needs_approval" || c.held) el.append(h("div.sec", h("h3", "Credits"),
-    h("div.kpis", kpi("Estimate", credits(c.estimate)), kpi("Held for this order", credits(c.held)), kpi("Wallet balance", credits(c.balance))),
-    o.state === "needs_approval" ? approveBtn(o) : null));
+  if (o.state === "needs_approval" || c.spent) el.append(h("div.sec", h("h3", "Credits"),
+    h("div.kpis", kpi("Environment fee", credits(c.environment_fee)), kpi("Price per QA-passed episode", credits(c.episode_price)), kpi("Wallet balance", credits(c.balance))),
+    o.state === "needs_approval" ? approveBtn(o) : h("p.caption", `Spent on this order so far: ${credits(c.spent)}.`),
+    o.state === "needs_approval" && c.balance != null && c.environment_fee != null && c.balance < c.environment_fee
+      ? h("p.caption", "Not enough credits. ", h("a", { href: "#", onclick: (e) => { e.preventDefault(); goBilling(); } }, "Top up in Billing"), ".") : null));
 }
 
 function planTab(o, el) {
@@ -756,7 +768,7 @@ function scene(o, el) {
   if (o.plan_summary) el.append(h("div.banner.ok", h("div", o.plan_summary)));
   if (o.has_scene_preview) el.append(h("div.sec", h("h3", "Scene render · MuJoCo"),
     h("img.preview.real", { src: Agri.fileUrl(o.id, "scene.png") + "?v=" + (o.plan.base_seed || 0), alt: "MuJoCo render of the cafe counter scene" }),
-    h("p.caption", `${p.task} · ${p.robot} · layout ${p.layout_ids[0]}, style ${p.style_ids[0]}. A cup of coffee on the counter, a tray next to it, and a coffee machine behind.`)));
+    h("p.caption", `${p.task} · ${p.robot} · layout ${p.layout_ids[0]}, style ${p.style_ids[0]}. A cup of coffee on the counter, a tray next to it, and a coffee machine behind. This scene is published to the marketplace as a game.`)));
   else {
     const env = o.stages.find((x) => x.key === "environment");
     if (env.status === "running") el.append(h("div.banner.info", h("span.spin"), h("div", "Rendering the scene in MuJoCo · ", since(env.started_at))));
@@ -772,190 +784,97 @@ function scene(o, el) {
   if (p.rationale) el.append(h("div.sec", h("h3", "Rationale"), h("div.kv", p.rationale)));
 }
 
-function playTab(o, el) {
-  const pl = o.play || {};
-  const st = o.stages.find((x) => x.key === "play");
-  const open = o.state === "needs_play" || (st && st.status === "done");
-  if (!open) { el.append(waitBanner(o, "play", "The browser game opens once the scene is built.")); return; }
-  if (o.state === "needs_play") el.append(h("div.banner.warn", h("div",
-    h("b", "Human demo. "), "The player controls the robot in the browser game; you watch live here. Submit an episode from the player view, then continue to AI data collection.")));
-  const eps = pl.human_episodes || [];
-  el.append(h("div.sec", h("h3", "Live view"),
-    h("div.frame16", pl.viewer_url && o.state === "needs_play"
-      ? h("iframe", { src: pl.viewer_url, title: "Live view of the player's session", allow: "fullscreen" })
-      : h("div.ph", pl.viewer_url ? "Play is closed for this order." : "Game server not connected. Set AGRIPHILO_GAME_SERVER_URL and restart the console.")),
-    pl.player_url && o.state === "needs_play" ? h("div", { style: "display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap" },
-      h("a.btn.primary.bigbtn", { href: pl.player_url, target: "_blank", rel: "noopener" }, "Open player view ↗"),
-      h("span.caption", { style: "margin:0" }, "Opens the game with keyboard control in a new tab (the player's screen).")) : null,
-    h("p.caption", "Published to the WEMINE marketplace — players can pick this game at ", h("a", { href: "/player", target: "_blank", rel: "noopener" }, "/player"), ".")));
-  if (o.spec) el.append(h("div.sec", h("h3", "Task"), h("ol.steps", o.spec.task_steps.map((t) => h("li", t)))));
-  el.append(h("div.sec", h("h3", `Human episodes · ${eps.length}`), eps.length
-    ? h("div.scroll-x", h("table.tbl",
-      h("thead", h("tr", h("th", "File"), h("th", "Player"), h("th.r", "Steps"), h("th.r", "Stages"), h("th", "Task"), h("th", "QA"), h("th.r", "Replay err"))),
-      h("tbody", eps.map((e) => h("tr", h("td.m", e.file.split("/").pop()), h("td", e.player_id), h("td.r", e.steps.toLocaleString()),
-        h("td.r", `${e.stages_completed}/${(o.spec?.task_steps || []).length || 2}`), h("td", e.success ? h("span.badge.b-green", h("i"), "Success") : h("span.badge.b-gray", h("i"), "Incomplete")),
-        h("td", e.qa_passed == null ? h("span.kv", "checking…") : e.qa_passed ? h("span.badge.b-green", h("i"), "Pass") : h("span.badge.b-red", { title: e.qa_reasons.join("; ") }, h("i"), "Fail"),
-          e.qa_reasons.length ? h("div.caption", e.qa_reasons.join("; ")) : null),
-        h("td.r", e.replay_max_qpos_err != null ? e.replay_max_qpos_err.toExponential(1) : "—"))))))
-    : h("div.kv", "No episode submitted yet.")));
-  if (pl.has_human_preview) el.append(h("div.sec", h("h3", "Human episode frames"),
-    h("img.preview.real", { src: Agri.fileUrl(o.id, "human_preview.png") + "?n=" + eps.length, alt: "Frames from the human episode" }),
-    h("p.caption", "Frames sampled over the latest human episode (recorded cameras).")));
-}
+function goBilling() { closeDetail(); view = "billing"; renderList(); }
 
-function dataTab(o, el) {
-  const sim = o.stages.find((x) => x.key === "simulation");
-  const pl = o.play || {};
-  if (sim.status === "running" && o.progress && o.progress.total) {
-    const pct = Math.round((o.progress.done / o.progress.total) * 100);
-    el.append(h("div.sec", h("h3", "AI players collecting"), h("div.prog", h("div", { style: `width:${pct}%` })),
-      h("div.kv", `${o.progress.done.toLocaleString()} of ${o.progress.total.toLocaleString()} episodes · ${pct}%`)));
-  }
-  const m = o.manifest;
-  if (!m && !pl.has_human_preview && !(o.job && o.job.episodes.length)) {
-    el.append(waitBanner(o, "simulation", "Data appears once the human demo is in and the AI players start collecting."));
-    return;
-  }
-  if (m) el.append(h("div.kpis",
-    kpi("Episodes", m.episodes.toLocaleString()), kpi("Frames", m.frames.toLocaleString()), kpi("Size", Agri.bytes(m.size_bytes)),
-    kpi("Human demos", String((pl.human_episodes || []).length)), kpi("Source", m.worker), kpi("Scene", m.scene_template)));
-  if (pl.has_human_preview) el.append(h("div.sec", h("h3", "Human demo · real MuJoCo recording"),
-    h("img.preview.real", { src: Agri.fileUrl(o.id, "human_preview.png") + "?n=" + (pl.human_episodes || []).length, alt: "Frames from the human episode" })));
-  if (o.has_preview) el.append(h("div.sec", h("h3", "AI player episodes"),
-    h("img.preview", { src: Agri.fileUrl(o.id, "preview.png"), alt: "First (top) and last (bottom) frame of six AI episodes" }),
-    h("p.caption", "Top row: first frame. Bottom row: last frame. Six episodes spread across the dataset.")));
-  if (o.spec) {
-    const d = o.spec.data, got = new Set(m ? m.sensors.filter((x) => !m.missing_sensors.includes(x)) : []);
-    el.append(h("div.sec", h("h3", "Requested schema vs recorded"), h("table.tbl",
-      h("thead", h("tr", h("th", "Field"), h("th", "Requested"), h("th", "Recorded"))),
-      h("tbody",
-        d.cameras.map((c) => h("tr", h("td", Agri.CAMERA_LABELS[c.name] || c.name), h("td.kv", `${c.width}×${c.height} · ${c.fps} fps`),
-          h("td", m ? (got.has("rgb") ? "✓" : "missing") : "—"))),
-        d.sensors.map((x) => h("tr", h("td", Agri.SENSOR_LABELS[x] || x), h("td.kv", `${d.control_hz} Hz`),
-          h("td", m ? (got.has(x) ? "✓" : h("span", { style: "color:var(--red)" }, "missing")) : "—")))))));
-  }
-  if (o.job && o.job.episodes.length) {
-    const eps = o.job.episodes, show = eps.slice(0, 20);
-    el.append(h("div.sec", h("h3", `Episode parameters · ${eps.length.toLocaleString()} episodes`), h("div.scroll-x", h("table.tbl",
-      h("thead", h("tr", h("th", "Episode"), h("th", "Player"), h("th.r", "Seed"), h("th.r", "Layout"), h("th.r", "Style"), h("th.r", "Jitter"))),
-      h("tbody", show.map((e) => h("tr", h("td.m", e.episode_id), h("td", e.player === "human" ? "Human" : "AI"), h("td.r", String(e.seed)),
-        h("td.r", String(e.layout_id)), h("td.r", String(e.style_id)), h("td.r", `${(e.placement_jitter_m * 100).toFixed(1)} cm`)))))),
-      eps.length > show.length ? h("p.caption", `+${(eps.length - show.length).toLocaleString()} more episodes (full list in the JSON tab)`) : null));
-  }
-  if (m) el.append(h("p.caption", { style: "overflow-wrap:anywhere" }, `${m.worker} ${m.simulator_version} · sha256 ${m.sha256.slice(0, 16)}…`));
-  if (o.worker && o.worker.startsWith("mock")) el.append(h("p.caption", MOCK_NOTE));
-}
-
-function qaTab(o, el) {
-  const m = o.qa_metrics, r = o.qa_report;
-  const st = o.stages.find((s) => s.key === "qa");
-  if (!m && !r) {
-    el.append(st.status === "running"
-      ? h("div.banner.info", h("span.spin"), h("div", st.detail || "Running QA", " · ", since(st.started_at)))
-      : h("div.banner.muted", "QA runs after the AI players finish collecting."));
-    return;
-  }
-  if (r) {
-    const cls = { pass: "ok", pass_with_notes: "warn", fail: "err" }[r.verdict] || "muted";
-    el.append(h("div.banner." + cls, h("div", h("div", { style: "display:flex;gap:8px;align-items:center;margin-bottom:4px" }, vbadge(r.verdict), h("b", "QA Agent verdict")), r.headline)));
-    el.append(h("div.sec", h("h3", "Findings"), h("ul.lst", r.findings.map((f) => h("li", f)))));
-    if (r.recommended_fixes.length) el.append(h("div.sec", h("h3", "Recommended fixes"), h("ul.lst", r.recommended_fixes.map((f) => h("li", f)))));
-    if (r.rerun_needed) el.append(h("div.banner.warn", h("div", h("b", "Rerun requested: "), r.rerun_focus || "")));
-  } else if (st.status === "running") {
-    el.append(h("div.banner.info", h("span.spin"), h("div", st.detail || "QA Agent is writing the report")));
-  }
-  if (!m) return;
+function marketTab(o, el) {
+  const L = o.listing;
+  if (!L) { el.append(waitBanner(o, "environment", "The game is published to the marketplace once the Environment Agent has built the scene.")); return; }
+  const c = o.credits || {};
+  el.append(L.status === "live"
+    ? h("div.banner.ok", h("div", h("b", "Live in the marketplace. "), "Players pick this game at ", h("a", { href: "/player", target: "_blank", rel: "noopener" }, "/player"),
+      " and play it in the browser. The QA Agent checks every submitted episode; QA-passed episodes can be bought below."))
+    : h("div.banner.muted", h("div", h("b", "Listing closed. "), "No new episodes are collected. You can still buy the QA-passed episodes that are left.")));
   el.append(h("div.kpis",
-    kpi("Valid episodes", `${m.episodes_valid.toLocaleString()} / ${m.episodes_total.toLocaleString()}`),
-    kpi("Success rate", `${Math.round(m.success_rate * 100)}%`),
-    kpi("Reproducible", `${m.repro_matched} / ${m.repro_checked}`)));
-  const cats = ["structure", "task", "diversity", "reproducibility"];
-  const icon = { pass: "✓", warn: "!", fail: "✕" };
-  el.append(h("div.sec", h("h3", "Checks"), h("table.tbl", h("tbody", cats.map((c) => {
-    const rows = m.checks.filter((x) => x.category === c);
-    if (!rows.length) return null;
-    return [h("tr", h("td.cat", { colspan: 3 }, c)), rows.map((x) => h("tr",
-      h("td", { style: "width:26px" }, h("span.st-i." + x.status, { title: x.status }, icon[x.status])),
-      h("td", { style: "font-weight:500" }, x.name), h("td.kv", x.detail)))];
-  })))));
-  el.append(h("div.sec", h("h3", "Coverage"), h("div.cov", Object.entries(m.coverage).map(([axis, bins]) => {
-    const fmt = (Agri.AXIS_FMT[axis] || { label: axis, f: (v) => v }).f;
-    const label = (Agri.AXIS_FMT[axis] || { label: axis }).label;
-    const max = Math.max(1, ...bins.map((b) => b.count));
-    return h("div.cov-c", h("b", label),
-      h("div.bars", bins.map((b) => h("div" + (b.count ? "" : ".zero"), {
-        style: `height:${b.count ? Math.max(6, (b.count / max) * 100) : 100}%`,
-        title: `${b.lo === b.hi ? fmt(b.lo) : fmt(b.lo) + " – " + fmt(b.hi)}: ${b.count} episodes` + (b.success_rate != null ? `, ${Math.round(b.success_rate * 100)}% success` : ""),
-      }))),
-      h("div.bars-l", bins.map((b) => h("span", b.count))),
-      h("div.bars-l", bins.map((b) => h("span", b.success_rate != null ? `${Math.round(b.success_rate * 100)}%` : "—"))),
-      h("div.bars-x", h("span", fmt(bins[0].lo)), h("span", "count · success"), h("span", fmt(bins[bins.length - 1].hi))));
-  }))));
-  const reasons = Object.entries(m.failure_reasons);
-  if (reasons.length) el.append(h("div.sec", h("h3", "Why unsuccessful episodes failed"), h("div.chips",
-    reasons.sort((a, b) => b[1] - a[1]).map(([k, v]) => h("span.chip", `${k.replace(/_/g, " ")} · ${v}`)))));
-  const invalid = (m.episodes || []).filter((e) => !e.valid);
-  el.append(h("div.sec", h("h3", `Excluded episodes · ${invalid.length}`), invalid.length
-    ? h("table.tbl", h("tbody", invalid.map((e) => h("tr", h("td.m", e.episode_id), h("td.kv", e.reasons.join("; "))))))
-    : h("div.kv", "None. Every episode passed the structural checks.")));
-}
+    kpi("Submitted", (L.submitted || 0).toLocaleString()), kpi("QA passed", (L.passed || 0).toLocaleString()), kpi("QA failed", (L.failed || 0).toLocaleString()),
+    kpi("Pending QA", (L.pending || 0).toLocaleString()), kpi("Available to buy", (L.available || 0).toLocaleString()), kpi("Purchased", (L.purchased || 0).toLocaleString())));
 
-function billing(o, el) {
-  const q = o.quote;
-  const st = o.stages.find((s) => s.key === "quote");
-  if (!q) {
-    el.append(st.status === "running"
-      ? h("div.banner.info", h("span.spin"), h("div", "Payment Agent is preparing the quote · ", since(st.started_at)))
-      : h("div.banner.muted", "The Payment Agent quotes the order after QA."));
-    return;
-  }
-  if (o.quote_summary) el.append(h("div.banner.ok", h("div", o.quote_summary)));
-  const items = q.line_items.filter((l) => l.amount_usd >= 0), disc = q.line_items.filter((l) => l.amount_usd < 0);
-  const row = (l) => h("tr", h("td", h("div", l.description), h("div.m", { style: "font-family:var(--mono);font-size:11px;color:var(--muted)" }, l.sku)),
-    h("td.r", `${l.quantity.toLocaleString()} ${l.unit}`), h("td.r", Agri.usd(l.unit_price_usd)), h("td.r", Agri.usd(l.amount_usd)));
-  el.append(h("div.sec", h("h3", "Quote"), h("div.scroll-x", h("table.tbl",
-    h("thead", h("tr", h("th", "Item"), h("th.r", "Qty"), h("th.r", "Unit price"), h("th.r", "Amount"))),
-    h("tbody", items.map(row),
-      h("tr.subt", h("td", { colspan: 3 }, "Subtotal"), h("td.r", Agri.usd(q.subtotal_usd))),
-      disc.map(row),
-      h("tr.tot", h("td", { colspan: 3 }, `Total (${q.currency})`), h("td.r", Agri.usd(q.total_usd)))))),
-    h("p.caption", `Valid for ${q.valid_days} days. ${config.pricing_note}`)));
-  if (q.notes.length) el.append(h("div.sec", h("h3", "Notes"), h("ul.lst", q.notes.map((n) => h("li", n)))));
-  if (o.payment) {
-    const viaStripe = o.payment.mode === "stripe_test";
-    el.append(h("div.banner.ok", h("div", h("b", `Paid ${Agri.usd(o.payment.amount_usd)} · ${viaStripe ? "Stripe test mode" : "test mode"}`), h("div", `Reference ${o.payment.reference} · ${new Date(o.payment.paid_at * 1000).toLocaleString()}`),
-      h("div", viaStripe ? "Paid through Stripe Checkout with a test card. No real charge was made." : "No real charge was made."))));
-  } else if (o.state === "awaiting_payment" && config.stripe) {
-    el.append(h("div", { style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" },
-      h("button.btn.primary", { onclick: (e) => { e.target.disabled = true; act("checkout"); } }, `Pay ${Agri.usd(q.total_usd)} with Stripe`),
-      h("span.caption", { style: "margin:0" }, "Stripe Checkout in test mode. Use card 4242 4242 4242 4242, any future date and CVC. No real charge.")));
-  } else if (o.state === "awaiting_payment") {
-    el.append(h("div", { style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" },
-      h("button.btn.primary", { onclick: (e) => { e.target.disabled = true; act("pay"); } }, `Pay ${Agri.usd(q.total_usd)} (test mode)`),
-      h("span.caption", { style: "margin:0" }, "Test checkout: no card, no real charge. Set STRIPE_SECRET_KEY (sk_test_…) in .env to pay through Stripe.")));
-  }
+  // buy box
+  const avail = L.available || 0, price = L.episode_price || c.episode_price || 0;
+  const n = h("input", { type: "number", min: 1, max: Math.max(1, avail), value: Math.min(avail, 10) || 1, "aria-label": "Episodes to buy", disabled: !avail });
+  const tot = h("span.tot"), bal = h("span.kv"), low = h("p.caption", { style: "margin:0" });
+  const buyBtn = h("button.btn.primary", { disabled: !avail });
+  const upd = () => {
+    const k = Math.max(1, Math.min(avail, Math.floor(+n.value || 0)));
+    const cost = k * price;
+    tot.textContent = credits(cost);
+    buyBtn.textContent = `Buy ${k.toLocaleString()} episode${k === 1 ? "" : "s"}`;
+    bal.textContent = c.balance != null ? `Wallet: ${credits(c.balance)}` : "";
+    const short = c.balance != null && cost > c.balance;
+    low.replaceChildren(...(short ? ["Not enough credits. ", h("a", { href: "#", onclick: (e) => { e.preventDefault(); goBilling(); } }, "Top up in Billing"), "."] : []));
+    buyBtn.disabled = !avail || short;
+    return k;
+  };
+  n.addEventListener("input", upd);
+  buyBtn.onclick = () => { const k = upd(); buyBtn.disabled = true; act("purchase", k); };
+  upd();
+  el.append(h("div.sec", h("h3", "Buy episodes"), h("div.buy",
+    avail ? h("div.row1", n, h("span.kv", `× ${credits(price)} =`), tot, h("div.spacer"), bal, buyBtn)
+      : h("div.kv", L.status === "live" ? "No QA-passed episodes left to buy yet. New ones appear here as players submit them." : "No QA-passed episodes left to buy."),
+    avail ? low : null,
+    h("p.caption", { style: "margin:0" }, "Buys the oldest QA-passed episodes you don't own yet. They are added to dataset.hdf5 in the Files tab."))));
+
+  // live view
+  el.append(h("div.sec", h("h3", "Live view"),
+    h("div.frame16", L.viewer_url && L.status === "live"
+      ? h("iframe", { src: L.viewer_url, title: "Live view of the current player's session", allow: "fullscreen" })
+      : h("div.ph", L.viewer_url ? "The listing is closed." : "Game server not connected. Set AGRIPHILO_GAME_SERVER_URL and restart the console.")),
+    L.play_url && L.status === "live" ? h("div", { style: "display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap" },
+      h("a.btn.bigbtn", { href: L.play_url, target: "_blank", rel: "noopener" }, "Open player view ↗"),
+      h("span.caption", { style: "margin:0" }, `Players earn ${credits(L.reward_per_episode)} per QA-passed episode.`)) : null));
+  if (o.spec) el.append(h("div.sec", h("h3", "Task"), h("ol.steps", o.spec.task_steps.map((t) => h("li", t)))));
+
+  // episodes
+  const eps = o.episodes || [];
+  el.append(h("div.sec", h("h3", `Episodes · ${eps.length.toLocaleString()}`), eps.length
+    ? h("div.scroll-x", h("table.tbl",
+      h("thead", h("tr", h("th", "Frames"), h("th", "Player"), h("th", "Submitted"), h("th.r", "Stages"), h("th", "QA"), h("th", "Quality"), h("th", "QA Agent"), h("th", "Owned"))),
+      h("tbody", eps.map((e) => h("tr",
+        h("td", e.has_thumb ? h("img.thumb", { src: Agri.fileUrl(o.id, `ep_${e.episode_id}.png`), alt: `Frames of episode ${e.episode_id}`, loading: "lazy" }) : h("span.kv", "—")),
+        h("td", h("div", e.player_id), h("div.caption", { style: "margin:0;font-family:var(--mono)" }, e.episode_id)),
+        h("td.kv", { style: "white-space:nowrap" }, Agri.ago(e.submitted_at), e.duration_s != null ? h("div.caption", { style: "margin:0" }, `${Math.round(e.duration_s)} s · ${e.steps.toLocaleString()} steps`) : null),
+        h("td.r", `${e.stages_completed}/${e.stages_total}`),
+        h("td", qbadge(e.qa)), h("td", stars(e.quality)),
+        h("td.kv", { style: "min-width:180px" }, e.qa_reason || (e.qa === "pending" ? "QA Agent is reviewing…" : "")),
+        h("td", e.purchased ? h("span.badge.b-blue", h("i"), "Bought") : h("span.kv", "—")))))))
+    : h("div.kv", "No episodes yet. They appear here as soon as players submit them.")));
+
+  // purchases
+  const buys = o.purchases || [];
+  if (buys.length) el.append(h("div.sec", h("h3", "Purchases"), h("table.tbl", h("tbody", buys.map((b) => h("tr",
+    h("td.kv", new Date(b.at * 1000).toLocaleString()), h("td", `${b.count.toLocaleString()} episode${b.count === 1 ? "" : "s"}`), h("td.r", credits(b.credits))))))));
+  if (L.status === "live") el.append(h("div.sec", h("button.btn.sm", { onclick: (e) => { e.target.disabled = true; act("close"); } }, "Close listing"),
+    h("p.caption", "Stops collecting new episodes. Episodes already QA-passed stay available to buy.")));
+  if (L.status === "closed") el.append(h("div.sec", h("button.btn.sm.primary", { onclick: (e) => { e.target.disabled = true; act("reopen"); } }, "Reopen listing"),
+    h("p.caption", "Publishes the game to the marketplace again so players can keep submitting episodes.")));
 }
 
 function files(o, el) {
-  if (!o.payment) {
-    el.append(h("div.lock", h("b", "Files unlock after payment"),
-      o.state === "awaiting_payment" ? h("div", "Pay the quote in the Billing tab (test mode) to download the dataset and QA report.")
-        : h("div", "The dataset, manifest, QA report and spec become available once QA and the quote are done and the order is paid.")));
-  } else {
-    el.append(h("div.files", o.files.map((name) => h("div.file",
-      h("div.fi", name.split(".").pop().toUpperCase().slice(0, 4)),
-      h("div.fn", h("b", name), h("small", FILE_INFO[name] || "", name === "dataset.hdf5" && o.manifest ? ` · ${Agri.bytes(o.manifest.size_bytes)}` : "")),
-      h("a.btn.sm", { href: Agri.fileUrl(o.id, name), download: true }, "Download")))));
-    if (o.manifest) el.append(h("p.caption", { style: "margin-top:12px;overflow-wrap:anywhere" },
-      `${o.manifest.episodes.toLocaleString()} episodes · ${o.manifest.frames.toLocaleString()} frames · ${o.manifest.worker} ${o.manifest.simulator_version} · sha256 ${o.manifest.sha256.slice(0, 16)}…`));
+  const names = o.files || [];
+  if (!names.length) {
+    el.append(h("div.lock", h("b", "Files unlock when you buy episodes"),
+      h("div", "Buy QA-passed episodes in the Marketplace tab; they are packed into a dataset you can download here.")));
+    return;
   }
-  if (o.worker && o.worker.startsWith("mock")) el.append(h("p.caption", { style: "margin-top:12px" }, MOCK_NOTE));
+  const bought = (o.episodes || []).filter((e) => e.purchased).length;
+  el.append(h("div.files", names.map((name) => h("div.file",
+    h("div.fi", name.split(".").pop().toUpperCase().slice(0, 4)),
+    h("div.fn", h("b", name), h("small", FILE_INFO[name] || "")),
+    h("a.btn.sm", { href: Agri.fileUrl(o.id, name) + "?n=" + bought, download: true }, "Download")))));
+  el.append(h("p.caption", { style: "margin-top:12px" }, `${bought.toLocaleString()} purchased episode${bought === 1 ? "" : "s"} in this dataset.`));
 }
 
 function json(o, el) {
-  const copy = { ...o, job: o.job ? { job_id: o.job.job_id, episodes: `${o.job.episodes.length} episodes (omitted)` } : null };
-  if (copy.qa_metrics) copy.qa_metrics = { ...copy.qa_metrics, episodes: `${copy.qa_metrics.episodes.length} episodes (omitted)` };
-  el.append(h("pre", JSON.stringify(copy, null, 2)));
+  el.append(h("pre", JSON.stringify(o, null, 2)));
 }
 
 /* ---------------- actions ---------------- */
@@ -970,16 +889,17 @@ async function act(kind, text) {
       composerTa.value = ""; drafts[id] = "";
     } else if (kind === "approve") {
       await Agri.approve(id); toast("Spec approved. Production started."); tab = "overview";
-    } else if (kind === "continue") {
-      await Agri.cont(id); toast("AI data collection started."); tab = "data";
     } else if (kind === "retry") {
       await Agri.retry(id); toast("Retrying from the failed stage."); tab = "overview";
-    } else if (kind === "pay") {
-      await Agri.pay(id); toast("Paid (test mode). Files unlocked."); tab = "files";
-    } else if (kind === "checkout") {
-      const { url } = await Agri.checkout(id);
-      location.href = url;  // Stripe's hosted checkout page
-      return;
+    } else if (kind === "purchase") {
+      const r = await Agri.purchase(id, text); tab = "files";
+      toast(`Bought ${text} episode${text === 1 ? "" : "s"}. Download them in Files.`);
+      wallet = null;
+      if (r && r.state) { full = r; detailSig = ""; }
+    } else if (kind === "close") {
+      await Agri.close(id); toast("Listing closed.");
+    } else if (kind === "reopen") {
+      await Agri.reopen(id); toast("Listing reopened.");
     }
   } catch (e) { toast(e.message); sendBtn.disabled = false; }
   await refreshList(); detailSig = ""; await loadDetail();
@@ -1001,6 +921,7 @@ $("mSubmit").onclick = async () => {
   $("mSubmit").disabled = true;
   try {
     const o = await Agri.create(text, $("mAuto").checked);
+    market = null;
     $("mText").value = ""; closeModal();
     view = "orders"; filter = "all";
     await refreshList(); select(o.id, "conversation");
@@ -1021,15 +942,16 @@ async function refreshList() {
     if (selected && !full) renderDetail(true);
   } catch (e) { /* server restarting; try again next tick */ }
 }
-const busy = (o) => o && (o.state === "running" || o.state === "needs_play");
+const busy = (o) => o && (o.state === "running" || o.state === "live");
 setInterval(() => { if (summaries.some(busy)) refreshList(); }, 3000);
 setInterval(() => { if (selected && (!full || busy(full))) loadDetail(); }, 2000);
+setInterval(() => { if (view === "market") loadMarket(); }, 5000);
 setInterval(() => document.querySelectorAll("[data-since]").forEach((el) => { el.textContent = Agri.elapsed(+el.dataset.since); }), 1000);
 
 Agri.config().then((c) => {
   config = c;
   $("demoPill").hidden = !c.demo;
-  $("simFoot").textContent = "Simulator: MuJoCo · AI players " + (String(c.worker).startsWith("mock") ? "mock" : c.worker);
+  $("simFoot").textContent = "Simulator: MuJoCo · players in the marketplace";
 });
 Agri.examples().then((ex) => {
   const labels = { cafe_order: "Example: cafe coffee serving (EN)", cafe_failure_order: "Example: failure repro (EN)" };
@@ -1046,17 +968,6 @@ refreshList().then(renderList).then(async () => {
     } else toast("Stripe checkout cancelled.");
     const nav = document.querySelector('.nav[data-view="billing"]'); if (nav) nav.click();
     return;
-  }
-  // Returning from Stripe Checkout: ?order=<id>&checkout=success|cancel&session_id=<id>
-  const p = new URLSearchParams(location.search), id = p.get("order"), res = p.get("checkout");
-  if (!id || !res) return;
-  history.replaceState(null, "", location.pathname);
-  if (res === "success") {
-    try { await Agri.confirm(id, p.get("session_id")); toast("Paid via Stripe (test mode). Files unlocked."); }
-    catch (e) { toast(e.message); }
-    await refreshList(); select(id, "files");
-  } else {
-    toast("Stripe checkout cancelled."); select(id, "billing");
   }
 });
 if (USER) {

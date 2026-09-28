@@ -4,91 +4,168 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WEMINE · Player</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17211c; background: #f7f8f6; }
+  :root {
+    --bg: #fbfbfa; --panel: #ffffff; --ink: #17181a; --ink-2: #4b4f55; --muted: #8a8f96; --line: #e7e7e4; --line-2: #efefec;
+    --green: #1f7a4d; --green-bg: #e6f2eb; --red: #c0362c; --red-bg: #fdeceb; --blue: #2b5fd9; --blue-bg: #eaf0fd;
+    --coffee: #3b2416; --coffee-2: #c47a2c;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg);
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; }
-  header { padding: 18px clamp(18px, 5vw, 64px); background: white; border-bottom: 1px solid #e3e8e2; display: flex; align-items: center; gap: 18px; }
-  header strong { font-size: 20px; letter-spacing: .04em; }
-  header a { color: #246543; text-decoration: none; }
-  main { max-width: 1100px; margin: auto; padding: 48px 20px; }
-  h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 42px); }
-  p { color: #59645d; line-height: 1.55; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin-top: 30px; }
-  .card { background: white; border: 1px solid #e0e7df; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 20px #15201708; }
-  .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #e7ece6; }
-  .card .body { padding: 18px; }
-  .card h2 { margin: 0 0 6px; font-size: 19px; }
-  .card p { margin: 0 0 16px; }
-  .meta { font-size: 13px; }
-  .button { display: inline-block; background: #1c7650; color: white; border-radius: 8px; padding: 10px 16px; text-decoration: none; font-weight: 650; }
-  .button:hover { background: #165d3f; }
-  .button.disabled { background: #dbe1dc; color: #66716a; pointer-events: none; }
-  .note { background: #edf5ef; border: 1px solid #d7e6da; border-radius: 10px; padding: 16px; }
+  body { margin: 0; font-size: 13.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: var(--blue); }
+  header { height: 56px; padding: 0 clamp(16px, 4vw, 40px); background: var(--panel); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; }
+  .logo { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, var(--coffee-2), var(--coffee)); display: grid; place-items: center; color: #fff; flex: none; }
+  .logo svg { width: 16px; height: 16px; }
+  header b { font-size: 14px; }
+  header .role { font-size: 12px; color: var(--muted); }
+  .spacer { flex: 1; }
+  .user { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+  .user .av { width: 24px; height: 24px; border-radius: 50%; background: var(--coffee); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 11.5px; }
+  .user a { color: var(--muted); text-decoration: none; } .user a:hover { color: var(--ink); text-decoration: underline; }
+  main { max-width: 1120px; margin: auto; padding: 32px 16px 56px; }
+  h1 { margin: 0 0 6px; font-size: clamp(24px, 3.4vw, 34px); letter-spacing: -0.01em; }
+  .lead { color: var(--ink-2); margin: 0 0 22px; max-width: 680px; }
+  h2 { font-size: 12px; font-weight: 600; color: var(--ink-2); margin: 34px 0 10px; text-transform: uppercase; letter-spacing: .04em; }
+  .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+  .kpi { padding: 12px 14px; border-right: 1px solid var(--line); min-width: 0; }
+  .kpi:last-child { border-right: 0; }
+  .kpi small { display: block; color: var(--muted); font-size: 11.5px; }
+  .kpi b { font-size: 18px; font-weight: 700; }
+  .note { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; color: var(--ink-2); margin-top: 14px; }
+  .mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+  .mcard { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+  .mcard .mimg { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: var(--line-2); }
+  .mcard .mph { width: 100%; aspect-ratio: 16 / 9; display: grid; place-items: center; background: var(--line-2); color: var(--muted); font-size: 12px; }
+  .mcard .mb { padding: 14px 14px 16px; display: grid; gap: 8px; flex: 1; align-content: start; }
+  .mcard .mt { display: flex; align-items: center; gap: 8px; }
+  .mcard .mt b { font-size: 14.5px; flex: 1; min-width: 0; }
+  .mcard .sub { color: var(--ink-2); font-size: 12.5px; }
+  .mcard ol { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 12.5px; }
+  .mcard .ms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; border-top: 1px solid var(--line-2); padding-top: 8px; }
+  .mcard .ms small { display: block; color: var(--muted); font-size: 11px; }
+  .mcard .ms b { font-weight: 600; font-size: 13px; }
+  .mcard .foot { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .reward { font-weight: 600; color: var(--green); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; padding: 8px 14px; text-decoration: none; font-weight: 600; background: var(--ink); color: #fff; margin-left: auto; white-space: nowrap; }
+  .btn:hover { background: #2d2f33; }
+  .btn.off { background: var(--line-2); color: var(--muted); pointer-events: none; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .badge i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .b-green { color: var(--green); background: var(--green-bg); }
+  .b-red { color: var(--red); background: var(--red-bg); }
+  .b-gray { color: var(--ink-2); background: var(--line-2); }
+  .tblw { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; font-weight: 500; color: var(--muted); padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--line-2); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.m { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
+  .stars { color: #d9922b; letter-spacing: 1px; white-space: nowrap; } .stars .off { color: var(--line); }
+  .muted { color: var(--muted); }
+  @media (max-width: 640px) { .user .nm, .user .sep { display: none; } .kpis { grid-template-columns: 1fr; } .kpi { border-right: 0; border-bottom: 1px solid var(--line); } .kpi:last-child { border-bottom: 0; } }
 </style>
 </head>
 <body>
-<header><strong>WEMINE</strong><a href="/requester">Requester console</a><a href="/?switch=1">Switch role</a></header>
-<main>
-  <h1>Play a task. Make a demonstration.</h1>
-  <p>Control a simulated café robot. Submitted episodes are checked before they become requester data.</p>
-  <div id="message" class="note">Loading games…</div>
-  <div id="games" class="grid"></div>
-</main>
 <script>
-const message = document.getElementById('message');
-const games = document.getElementById('games');
-function addCard(item) {
-  const card = document.createElement('article');
-  card.className = 'card';
-  if (item.scene_image_url) {
-    const image = document.createElement('img');
-    image.src = item.scene_image_url;
-    image.alt = 'Café simulation scene';
-    card.append(image);
-  }
-  const body = document.createElement('div');
-  body.className = 'body';
-  const title = document.createElement('h2');
-  title.textContent = item.title;
-  const description = document.createElement('p');
-  description.textContent = `${item.robot} · ${item.scene}`;
-  const meta = document.createElement('p');
-  meta.className = 'meta';
-  meta.textContent = `${item.episodes_passed}/${item.episodes_wanted} QA-passed episodes · ${item.status}`;
-  const link = document.createElement('a');
-  link.className = `button${item.status === 'open' && item.play_url ? '' : ' disabled'}`;
-  link.href = item.play_url || '#';
-  link.target = '_blank';
-  link.rel = 'noopener';
-  link.textContent = item.status === 'open' ? 'Play game →' : 'Closed';
-  body.append(title, description, meta, link);
-  card.append(body);
-  games.append(card);
+// Player session from the login page (/); ?nologin=1 skips the check for local testing.
+const USER = (() => { try { return JSON.parse(localStorage.getItem("wemine_user") || "null"); } catch (e) { return null; } })();
+if ((!USER || USER.role !== "player") && !new URLSearchParams(location.search).has("nologin")) location.replace("/" + location.search);
+</script>
+<header>
+  <div class="logo" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 12.5 8 6.5 11 12.5 14 3.5"/></svg></div>
+  <b>WEMINE</b><span class="role">Player</span>
+  <div class="spacer"></div>
+  <div class="user" id="userChip" hidden><span class="av" id="userAv"></span><span class="nm" id="userName"></span>
+    <a href="/?switch=1">Switch role</a><span class="sep">·</span><a href="/" id="signOut">Sign out</a></div>
+</header>
+<main>
+  <h1>Play a task. Earn credits.</h1>
+  <p class="lead">Pick a game from the marketplace and control the robot in your browser. The QA Agent checks every episode you submit; each QA-passed episode earns you credits.</p>
+  <div class="kpis" id="kpis"></div>
+  <h2>Marketplace</h2>
+  <div id="message" class="note">Loading games…</div>
+  <div id="games" class="mgrid"></div>
+  <h2>My episodes</h2>
+  <div id="mine"></div>
+</main>
+<script src="/static/app.js"></script>
+<script>
+const { h } = Agri;
+const $ = (id) => document.getElementById(id);
+const PID = USER && USER.email ? Agri.playerId(USER.email) : "guest";
+const credits = (v) => `${(+v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits`;
+const QA = { pass: ["b-green", "Pass"], fail: ["b-red", "Fail"], pending: ["b-gray", "Checking…"] };
+const qbadge = (v) => { const [c, l] = QA[v] || ["b-gray", v]; return h("span.badge." + c, h("i"), l); };
+const stars = (n) => n == null ? h("span.muted", "—") : h("span.stars", { title: `${n} / 5` }, "★".repeat(n), h("span.off", "★".repeat(5 - n)));
+const kpi = (k, v) => h("div.kpi", h("small", k), h("b", v));
+
+function playUrl(url) {
+  if (!url) return "";
+  return url + (url.includes("?") ? "&" : "?") + "player_id=" + encodeURIComponent(PID);
 }
-Promise.all([
-  fetch('/api/marketplace').then(r => r.json()),
-  fetch('/api/games').then(r => r.json())
-]).then(([market, config]) => {
-  const items = market.items || [];
-  items.forEach(addCard);
-  if (items.length) {
-    message.textContent = config.game_server_url
-      ? 'Choose an open game below. The game opens in a new tab.'
-      : 'Start the MuJoCo game server and set AGRIPHILO_GAME_SERVER_URL before starting this console.';
-  } else if (config.game_server_url) {
-    message.textContent = 'No requester games are published yet. Try the café pilot directly: ';
-    const link = document.createElement('a');
-    link.className = 'button';
-    link.href = `${config.game_server_url.replace(/\/$/, '')}/?role=player`;
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.textContent = 'Play café pilot →';
-    message.append(link);
-  } else {
-    message.textContent = 'No games are published yet. Start the game server on port 8010, connect it to this console, or create a requester order.';
-  }
-}).catch(() => { message.textContent = 'Could not load games. Refresh after the WEMINE server starts.'; });
+
+function card(m) {
+  const open = m.status === "live" && m.play_url;
+  return h("article.mcard",
+    m.scene_image_url ? h("img.mimg", { src: m.scene_image_url, alt: "MuJoCo render of the game scene", loading: "lazy" }) : h("div.mph", "Scene preview pending"),
+    h("div.mb",
+      h("div.mt", h("b", m.title), h("span.badge." + (m.status === "live" ? "b-green" : "b-gray"), h("i"), m.status === "live" ? "Live" : "Closed")),
+      h("div.sub", `${m.robot} · ${m.scene}`),
+      m.task_steps && m.task_steps.length ? h("ol", m.task_steps.map((t) => h("li", t))) : null,
+      h("div.ms",
+        h("div", h("small", "Wanted"), h("b", (m.episodes_wanted || 0).toLocaleString())),
+        h("div", h("small", "Submitted"), h("b", (m.episodes_submitted || 0).toLocaleString())),
+        h("div", h("small", "QA passed"), h("b", (m.episodes_passed || 0).toLocaleString()))),
+      h("div.foot", h("span.reward", `+${credits(m.reward_per_episode)}`), h("span.muted", "per QA-passed episode"),
+        h("a.btn" + (open ? "" : ".off"), open ? { href: playUrl(m.play_url), target: "_blank", rel: "noopener" } : {}, open ? "Play →" : "Closed"))));
+}
+
+let gamesSig = "";
+async function loadGames() {
+  try {
+    const items = await Agri.marketplace();
+    const sig = JSON.stringify(items);
+    if (sig === gamesSig) return;
+    gamesSig = sig;
+    $("games").replaceChildren(...items.map(card));
+    const live = items.filter((m) => m.status === "live").length;
+    $("message").textContent = items.length
+      ? `${live} live game${live === 1 ? "" : "s"}. The game opens in a new tab; submit your episode there when you finish the task.`
+      : "No games are published yet. They appear here as soon as a requester's scene is built.";
+    $("message").hidden = false;
+  } catch (e) { $("message").textContent = "Could not load games. Refresh after the WEMINE server starts."; }
+}
+
+async function loadMine() {
+  let me;
+  try { me = await Agri.player(PID); } catch (e) { me = { balance: 0, episodes: [] }; }
+  const eps = me.episodes || [];
+  const passed = eps.filter((e) => e.qa === "pass").length;
+  $("kpis").replaceChildren(kpi("Earned credits", credits(me.balance)), kpi("Episodes submitted", eps.length.toLocaleString()), kpi("QA passed", passed.toLocaleString()));
+  $("mine").replaceChildren(eps.length
+    ? h("div.tblw", h("table",
+      h("thead", h("tr", h("th", "Game"), h("th", "Episode"), h("th", "Submitted"), h("th", "QA"), h("th", "Quality"), h("th", "QA Agent"), h("th", { style: "text-align:right" }, "Reward"))),
+      h("tbody", eps.map((e) => h("tr",
+        h("td", e.title), h("td.m", e.episode_id), h("td.muted", { style: "white-space:nowrap" }, e.submitted_at ? Agri.ago(e.submitted_at) : "—"),
+        h("td", qbadge(e.qa)), h("td", stars(e.quality)), h("td", e.qa_reason || (e.qa === "pending" ? "Reviewing…" : "")),
+        h("td.r", e.reward_credits ? `+${credits(e.reward_credits)}` : "—"))))))
+    : h("div.note", "No episodes yet. Play a game above and submit an episode to earn credits."));
+}
+
+if (USER) {
+  $("userChip").hidden = false;
+  $("userName").textContent = USER.name || USER.email;
+  $("userAv").textContent = (USER.name || USER.email || "?").trim()[0].toUpperCase();
+}
+$("signOut").onclick = (e) => { e.preventDefault(); try { localStorage.removeItem("wemine_user"); } catch (err) { /* storage blocked */ } location.href = "/"; };
+
+loadGames(); loadMine();
+setInterval(() => { loadGames(); loadMine(); }, 5000);
 </script>
 </body>
 </html>

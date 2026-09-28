@@ -1,0 +1,10 @@
+# MuJoCo game server (sim/web/server.py) and scene rendering (sim/scripts/render_scene.py).
+# Install into sim/.venv (Python 3.11) AFTER the two upstream packages; see README "One-time game setup":
+#   sim/.venv/bin/python -m pip install -e sim/third_party/robosuite -e sim/third_party/robocasa
+#   sim/.venv/bin/python -m pip install -r sim/requirements.txt
+fastapi
+uvicorn[standard]
+websockets
+h5py
+pillow
+numpy

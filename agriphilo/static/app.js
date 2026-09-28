@@ -11,7 +11,7 @@ window.Agri = (() => {
     return data;
   }
 
-  // Coverage axes computed by qa_checks.py: bins are integer ids (lo == hi) or stage counts.
+  // Coverage axes (integer ids or stage counts), kept for the QA views.
   const AXIS_FMT = {
     layout_id: { label: "Counter layouts", f: (v) => `layout ${v}` },
     style_id: { label: "Visual styles", f: (v) => `style ${v}` },
@@ -92,15 +92,14 @@ window.Agri = (() => {
     create: (text, auto) => api("POST", "/api/orders", { text, auto }),
     answer: (id, text) => api("POST", `/api/orders/${id}/answer`, { text }),
     approve: (id) => api("POST", `/api/orders/${id}/approve`),
-    pay: (id) => api("POST", `/api/orders/${id}/pay`),
-    checkout: (id) => api("POST", `/api/orders/${id}/checkout`),
+    purchase: (id, count) => api("POST", `/api/orders/${id}/purchase`, { count }),
+    close: (id) => api("POST", `/api/orders/${id}/close`),
+    reopen: (id) => api("POST", `/api/orders/${id}/reopen`),
     wallet: () => api("GET", "/api/wallet"),
     walletCheckout: (credits) => api("POST", "/api/wallet/checkout", { credits }),
     walletConfirm: (sessionId) => api("POST", "/api/wallet/confirm", { session_id: sessionId }),
     walletTestTopup: (amount) => api("POST", "/api/wallet/topup", { amount }),
-    confirm: (id, sessionId) => api("POST", `/api/orders/${id}/confirm`, { session_id: sessionId }),
     retry: (id) => api("POST", `/api/orders/${id}/retry`),
-    cont: (id) => api("POST", `/api/orders/${id}/continue`),
     fileUrl: (id, name) => `/api/orders/${id}/files/${name}`,
     // Players: id is derived from the signed-in email (the server uses the same rule).
     playerId: (email) => String(email || "").trim().toLowerCase().replace(/[^a-z0-9._-]/g, "-"),

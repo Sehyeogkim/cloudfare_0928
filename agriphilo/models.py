@@ -133,6 +133,34 @@ class HumanEpisode(BaseModel):
     at: Optional[float] = None
 
 
+# ---- Marketplace ------------------------------------------------------------------------------
+
+class MarketEpisode(BaseModel):
+    """One episode a player submitted to a marketplace listing, with its QA verdict."""
+    episode_id: str
+    file: str
+    player_id: str
+    submitted_at: float
+    steps: int
+    duration_s: float
+    stages_completed: int
+    stages_total: int
+    success: bool
+    qa: Literal["pending", "pass", "fail"] = "pending"
+    quality: Optional[int] = None
+    qa_reason: str = ""
+    reward_credits: float = 0.0
+    purchased: bool = False
+    has_thumb: bool = False
+
+
+class Purchase(BaseModel):
+    at: float
+    count: int
+    credits: float
+    episode_ids: List[str]
+
+
 # ---- Data Collection ------------------------------------------------------------------------
 
 class Manifest(BaseModel):

@@ -132,13 +132,15 @@ function render(s) {
   document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === s.view));
 }
 
+// Physical key position (e.code), so controls work in any keyboard layout or input mode (e.g. Korean IME).
+const keyName = e => e.code.startsWith('Shift') ? 'shift' : e.code.startsWith('Key') ? e.code.slice(3).toLowerCase() : '';
 stage.addEventListener('keydown', e => {
-  const k = e.key === 'Shift' ? 'shift' : e.key.toLowerCase();
+  const k = keyName(e);
   if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) send({type:'grip'}); return; }
   if (MOVE.has(k)) { e.preventDefault(); if (!keys.has(k)) { keys.add(k); sendKeys(); } }
 });
 stage.addEventListener('keyup', e => {
-  const k = e.key === 'Shift' ? 'shift' : e.key.toLowerCase();
+  const k = keyName(e);
   if (keys.delete(k)) sendKeys();
 });
 stage.addEventListener('blur', () => { keys.clear(); sendKeys(); });

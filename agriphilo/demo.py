@@ -174,8 +174,22 @@ def _payment(t: Dict[str, Any]) -> Dict[str, Any]:
     }}
 
 
+def _episode_qa(t: Dict[str, Any]) -> Dict[str, Any]:
+    facts = json.loads(t["input"].rsplit("Review this episode:\n", 1)[-1])
+    done, total = facts["task_stages_completed"], facts["task_stages_total"]
+    idle = facts["idle_ratio"]
+    if done < total:
+        v, q, why = "fail", 1 if done == 0 else 2, f"Stopped after {done} of {total} task stages."
+    elif idle > 0.6:
+        v, q, why = "fail", 2, f"Task completed but the robot was idle {idle:.0%} of the time."
+    else:
+        q = 5 if facts["duration_s"] < 40 and idle < 0.3 else 4 if facts["duration_s"] < 90 else 3
+        v, why = "pass", f"All {total} stages completed in {facts['duration_s']:.0f} s."
+    return {"status": "ready", "episode_review": {"verdict": v, "quality": q, "reason": f"[Demo] {why}"}}
+
+
 HANDLERS = {"Customer Agent": _customer, "Orchestrator Agent": _orchestrator, "Environment Agent": _environment,
-            "Game Environment Agent": _game_environment, "QA Agent": _qa, "Payment Agent": _payment}
+            "Game Environment Agent": _game_environment, "QA Agent": _qa, "Episode QA Agent": _episode_qa, "Payment Agent": _payment}
 
 
 class DemoBrainbase:
