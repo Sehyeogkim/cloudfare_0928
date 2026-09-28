@@ -13,3 +13,13 @@ sim/data/
 sim/*.log
 sim/web/*.log
 sim/MUJOCO_LOG.TXT
+
+# Internal notes, pitch material and assistant config (kept locally, not part of the submission)
+slides/
+make_agriflow_*.py
+plan.md
+business_plan.md
+instruction.md
+docs/plan_*.md
+CLAUDE.md
+Screenshot*.png
