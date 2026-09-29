@@ -1,3 +1,5 @@
+🥉 **3rd place — [Cloudflare Speed Run Hackathon](https://luma.com/g42o84ln)**
+
 ![WEMINE connects two roles: a requester defines a robot task, WEMINE builds and publishes the game, a separate player performs it, and validated data returns to the requester](docs/assets/wemine-overview.png)
 
 # WEMINE
